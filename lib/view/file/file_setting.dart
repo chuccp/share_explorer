@@ -15,7 +15,7 @@ class FileSettingPage extends StatefulWidget {
 }
 
 class _FileSettingPageState extends State<FileSettingPage> {
-  int selectIndex = 2;
+  int selectIndex = 1;
 
   @override
   Widget build(BuildContext context) {

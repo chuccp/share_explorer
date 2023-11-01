@@ -33,13 +33,37 @@ class UserOperate {
     return res;
   }
 
-  static Future<Response<ExPage<ExPath>>> queryPath({required int pageNo, required int pageSize}) async {
-    var list = <Map<String, dynamic>>[
-      for (var i = 0; i < pageSize; i++) {"id": i + (pageNo * pageSize), "name": "name_${pageNo}_$i", "path": "path_${pageNo}_$i"}
-    ];
-    Map<String, dynamic> data = {"total": 200, "list": list};
-    Map<String, dynamic> json = {"code": 200, "data": data};
-    return Response.fromJsonToPathPage(json);
+
+
+  static Future<Response<ExPage<ExPath>>> queryPath(
+      {required int pageNo, required int pageSize}) async {
+    var url = "${HttpClient.getBaseUrl()}user/queryPath?pageNo=$pageNo&pageSize=$pageSize";
+    var response = await HttpClient.get(url);
+    var data = response.data;
+    var res = Response.fromJsonToPathPage(data);
+    return res;
+  }
+
+
+  static Future<Response> addPath({required String name, required String path}) async {
+    var url = "${HttpClient.getBaseUrl()}user/addPath";
+    var postData = {
+      "name": name,
+      "path": path,
+    };
+    var response = await HttpClient.postJson(url, jsonEncode(postData));
+    var data = response.data;
+    var res = Response.fromJson(data);
+    return res;
+  }
+
+
+  static Future<Response<ExPage<ExPath>>> queryAllPath() async {
+    var url = "${HttpClient.getBaseUrl()}user/queryAllPath";
+    var response = await HttpClient.get(url);
+    var data = response.data;
+    var res = Response.fromJsonToPathPage(data);
+    return res;
   }
 
   static Future<Response<ExPage<Map<String, dynamic>>>> queryJsonPath({required int pageNo, required int pageSize}) async {

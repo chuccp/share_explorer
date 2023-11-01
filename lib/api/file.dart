@@ -1,14 +1,21 @@
 import '../entry/file.dart';
-
+import '../util/http_client.dart';
 class FileOperate {
   static Future<List<FileItem>> rootListSync() async {
-    return Future.value(<FileItem>[FileItem(name: "aaa", isDir: true, isDisk: false, path: "aaa", modifyTime: DateTime.timestamp())]);
+    var url = "${HttpClient.getBaseUrl()}file/root";
+    var response = await HttpClient.get(url);
+    List<dynamic> list = response.data;
+    List<FileItem> fileItemList =
+    list.map((e) => FileItem.fromJson(e)).toList();
+    return fileItemList;
   }
 
   static Future<List<FileItem>> pathListSync({required String path_}) async {
-    return Future.value(<FileItem>[
-      FileItem(name: "vvv", isDir: true, isDisk: false, path: "${path_}vvv", modifyTime: DateTime.timestamp()),
-      FileItem(name: "zzz", isDir: true, isDisk: false, path: "${path_}zzz", modifyTime: DateTime.timestamp())
-    ]);
+    var url = "${HttpClient.getBaseUrl()}file/paths?Path=$path_";
+    var response = await HttpClient.get(url);
+    List<dynamic> list = response.data;
+    List<FileItem> fileItemList =
+    list.map((e) => FileItem.fromJson(e)).toList();
+    return fileItemList;
   }
 }

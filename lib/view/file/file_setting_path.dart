@@ -5,21 +5,38 @@ import '../../api/user.dart';
 import '../../component/ex_dialog.dart';
 import '../../component/ex_table.dart';
 import '../../component/ex_tree_file.dart';
-
-class PathList extends StatelessWidget {
+class PathList extends StatefulWidget{
   const PathList({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    DataTableController dataTableController = DataTableController(columnNames: ["ID", "名称", "路径"]);
-    UserOperate.queryPath(pageNo: 1, pageSize: dataTableController.page.pageSize!).then((value) {
+  State<StatefulWidget> createState() =>_PathListState();
+
+}
+
+class _PathListState extends State<PathList> {
+  DataTableController dataTableController = DataTableController(columnNames: ["ID", "名称", "路径"]);
+
+  late int pageNo;
+
+  void query(int pageNo){
+    this.pageNo = pageNo;
+    UserOperate.queryPath(pageNo: pageNo, pageSize: dataTableController.page.pageSize!).then((value) {
       var list = value.data!.list;
       var total = value.data!.total;
       var dataList = <List<dynamic>>[
         for (var ele in list!) <dynamic>[ele.id, ele.name, ele.path]
       ];
-      dataTableController.updateTable(dataList, total!, 1);
+      dataTableController.updateTable(dataList, total!, pageNo);
     });
+  }
+  @override
+  void initState() {
+    query(1);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
     return ExTable(
       dataTableController: dataTableController,
       addCallback: () {
@@ -33,6 +50,16 @@ class PathList extends StatelessWidget {
               pathController: pathController,
             ),
             onPressed: () {
+              UserOperate.addPath(name: nameController.text,
+                  path: pathController.text).then((value){
+                    if(value.isOK()){
+                      print("==================");
+                      query(pageNo);
+                      return true;
+                    }else{
+                      return false;
+                    }
+              });
               return Future(() => true);
             });
       },
@@ -40,14 +67,7 @@ class PathList extends StatelessWidget {
         print(index);
       },
       onPageChanged: (int pageNo) {
-        UserOperate.queryPath(pageNo: pageNo, pageSize: dataTableController.page.pageSize!).then((value) {
-          var list = value.data!.list;
-          var total = value.data!.total;
-          var dataList = <List<dynamic>>[
-            for (var ele in list!) <dynamic>[ele.id, ele.name, ele.path]
-          ];
-          dataTableController.updateTable(dataList, total!, pageNo);
-        });
+        query(pageNo);
       },
     );
   }

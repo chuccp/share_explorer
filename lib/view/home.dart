@@ -7,6 +7,7 @@ import '../api/user.dart';
 import '../component/ex_card.dart';
 import '../component/ex_load.dart';
 import '../entry/info.dart';
+import '../util/cache.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.navigationShell});
@@ -31,6 +32,7 @@ class LoadPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     UserOperate.info().then((value) {
+      ExCache.saveInfoItem(value);
       if (value.hasInit!) {
         GoRouter.of(context).replace("/file", extra: {"info": value});
       } else {
