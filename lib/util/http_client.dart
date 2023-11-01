@@ -6,8 +6,10 @@ import 'local_store.dart';
 class HttpClient {
   static final httpClient = dio.Dio();
 
-  static get(String url) async {
-    return await httpClient.get(url, options: await getOptions());
+
+
+  static get(String url,{Map<String, dynamic>? queryParameters}) async {
+    return await httpClient.get(url,queryParameters:queryParameters, options: await getOptions());
   }
 
   static postJson(String url, String body) async {

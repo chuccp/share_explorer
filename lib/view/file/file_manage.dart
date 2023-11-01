@@ -26,8 +26,16 @@ class _FileManagePageState extends State<FileManagePage> {
     setState(() {
       this.exPaths.clear();
       this.exPaths.addAll(exPaths);
+      if(exPaths.isNotEmpty){
+        selectIndex = 0;
+      }
     });
+  }
 
+  _updateIndex(int index){
+    setState(() {
+      selectIndex = index;
+    });
   }
 
   void _queryAll(){
@@ -78,7 +86,7 @@ class _FileManagePageState extends State<FileManagePage> {
                       ),
                       Expanded(
                           child: ExButtonGroup(titles: titles,indexCallback:(index){
-                            print(index);
+                            _updateIndex(index);
                           })
                           ),
                       const Divider(
@@ -103,9 +111,9 @@ class _FileManagePageState extends State<FileManagePage> {
                   ),
                 ),
                 Expanded(child: Builder(builder: (BuildContext context) {
-
-                  if(selectIndex==0){
-                    return const FileExplorer();
+                  if(selectIndex>=0){
+                    print(selectIndex);
+                    return  FileExplorer(rootPath: exPaths[selectIndex].path!,);
                   }else{
                     return const Text("");
                   }

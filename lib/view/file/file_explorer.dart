@@ -1,28 +1,143 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../api/file.dart';
 import '../../component/ex_button_group.dart';
 import '../../component/ex_file_process.dart';
+import '../../component/ex_load.dart';
 import '../../component/file_icon_button.dart';
 import '../../entry/file.dart';
+import '../../entry/progress.dart';
 
-class FileExplorer extends StatefulWidget {
-  const FileExplorer({super.key});
 
-  @override
-  State<StatefulWidget> createState() => _FileExplorerState();
-}
+class FilePageDelegate extends ChangeNotifier {
+  final List<PathItem> _pathItem = [];
+  final List<FileItem> _fileItems = [];
 
-class _FileExplorerState extends State<FileExplorer> {
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(15, 5, 0, 0),
-      child: Column(
-        children: [_FileOperate(), _FilePath(), Expanded(child: _FileListView())],
-      ),
-    );
+  final Map<String, Progress> _progresses = <String, Progress>{};
+
+  final List<FocusNode> _focusNodes = [];
+
+  UnmodifiableListView<PathItem> get items => UnmodifiableListView(_pathItem);
+
+  PathItem get lastItem => _pathItem[_pathItem.length - 1];
+
+  PathItem _backItems() {
+    var i = index - 1;
+    return _pathArrowItem[i - 1];
+  }
+
+  PathItem _forwardItems() {
+    var i = index + 1;
+    return _pathArrowItem[i - 1];
+  }
+
+  PathItem get backItems => _backItems();
+
+  PathItem get forwardItems => _forwardItems();
+
+  bool get hasBack => index > 1;
+
+  bool get hasForward => index < _pathArrowItem.length;
+
+  UnmodifiableListView<FileItem> get fileItems =>
+      UnmodifiableListView(_fileItems);
+
+  UnmodifiableListView<FocusNode> get focusNodes =>
+      UnmodifiableListView(_focusNodes);
+
+  UnmodifiableListView<Progress> get progresses =>
+      UnmodifiableListView(_progresses.values);
+
+  void updateProgresses(Progress progress) {
+    if (_progresses.containsKey(progress.id)) {
+      _progresses[progress.id]!.count = progress.count;
+    } else {
+      _progresses[progress.id!] = progress;
+    }
+    notifyListeners();
+  }
+
+  int index = 0;
+  final List<PathItem> _pathArrowItem = [];
+
+  void disposeFocusNodes() {
+    if (_focusNodes.isNotEmpty) {
+      for (var fi in _focusNodes) {
+        fi.unfocus();
+      }
+    }
+    _focusNodes.clear();
+  }
+
+  void unFocusNodes() {
+    if (_focusNodes.isNotEmpty) {
+      for (var fi in _focusNodes) {
+        fi.unfocus();
+      }
+    }
+  }
+
+  String _rootPath = "";
+
+  String get rootPath => _rootPath;
+
+  void toPath(
+      {required String path,
+        required List<FileItem> fileItems,
+        required bool isArrow,
+        required String rootPath}) {
+    _rootPath = rootPath;
+    _focusNodes.addAll([for (var _ in fileItems) FocusNode()]);
+    _pathItem.clear();
+    _pathItem.addAll(PathItem.splitPath(path));
+    _fileItems.clear();
+    _fileItems.addAll(fileItems);
+    if (!isArrow) {
+      _pathArrowItem.clear();
+      _pathArrowItem.addAll(_pathItem);
+      index = _pathArrowItem.length;
+    } else {
+      index = _pathItem.length;
+    }
+    notifyListeners();
   }
 }
 
+
+void loadFileAsset(
+    {required BuildContext context,
+      required String rootPath,
+      required String path,
+      required bool isArrow}) {
+  Provider.of<FilePageDelegate>(context, listen: false).disposeFocusNodes();
+  FileOperate.listSync(path_: path, rootPath: rootPath).then((value) => {
+    Provider.of<FilePageDelegate>(context, listen: false).toPath(
+        path: path, fileItems: value, isArrow: isArrow, rootPath: rootPath)
+  });
+}
+
+class FileExplorer extends StatelessWidget {
+  const FileExplorer({super.key, required this.rootPath});
+
+ final String rootPath;
+
+  @override
+  Widget build(BuildContext context) {
+
+    return ChangeNotifierProvider(
+      create: (BuildContext context) => FilePageDelegate(),
+      child:  Padding(
+        padding: const EdgeInsets.fromLTRB(15, 5, 0, 0),
+        child: Column(
+          children: [const _FileOperate(), const _FilePath(), Expanded(child: _FileListView(rootPath: rootPath,))],
+        ),
+      ),
+    );
+
+  }
+}
 class _FileOperate extends StatelessWidget {
   const _FileOperate({super.key});
 
@@ -140,13 +255,52 @@ class _PathView extends StatelessWidget {
     return const Row(children: [Text("全部文件"), Text(">"), Text("全部文件")]);
   }
 }
+class _FileListView extends StatefulWidget{
 
-class _FileListView extends StatelessWidget {
-  const _FileListView({super.key});
+  const _FileListView({super.key, required this.rootPath});
+
+  final String rootPath;
+
+  @override
+  State<StatefulWidget> createState()=>_FileListViewState();
+
+}
+class _FileListViewState extends State<_FileListView> {
+
 
   @override
   Widget build(BuildContext context) {
-    var children = <Widget>[for (var i = 0; i < 100; i++) FileIconButton.fileItem(fileItem: FileItem(isDir: i & 1 > 0, name: "文件"), onPressed: () {}, onDoubleTap: () {})];
+    var items = Provider.of<FilePageDelegate>(context).fileItems;
+    var focusNodes = Provider.of<FilePageDelegate>(context).focusNodes;
+    var rootPath = Provider.of<FilePageDelegate>(context).rootPath;
+    if (rootPath.isEmpty || widget.rootPath!=rootPath){
+      loadFileAsset(context: context, rootPath: widget.rootPath, path: "/", isArrow: false);
+      return  ExLoading();
+    }
+    final List<Widget> children = <Widget>[
+      for (int i = 0; i < items.length; i++)
+        FileIconButton.fileItem(
+          fileItem: items[i],
+          focusNode: focusNodes.elementAt(i),
+          onPressed: () => {focusNodes.elementAt(i).requestFocus()},
+          onDoubleTap: () {
+            if (items[i].isDir!) {
+              loadFileAsset(context:context, rootPath:widget.rootPath, path:items[i].path!, isArrow:false);
+            } else {
+              Future.delayed(const Duration(milliseconds: 100)).then((value) {
+                // FilePicker.platform.saveFile(fileName: items[i].name).then((value) {
+                //   if (value != null && value.isNotEmpty) {
+                //     FileOperate.downLoadFile(fileItem: items[i], localPath: value);
+                //   }
+                // });
+              });
+              Provider.of<FilePageDelegate>(context, listen: false).unFocusNodes();
+            }
+          },
+        )
+    ];
+
+
     return Container(
         padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
         child: GestureDetector(
@@ -160,4 +314,6 @@ class _FileListView extends StatelessWidget {
           ),
         ));
   }
+
+
 }
