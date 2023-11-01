@@ -12,10 +12,8 @@ class FileManagePage extends StatefulWidget {
 }
 
 class _FileManagePageState extends State<FileManagePage> {
-
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 1),()=> GoRouter.of(context).push("/fileSetting"));
     return Material(
         borderOnForeground: false,
         color: Colors.white,
@@ -30,10 +28,7 @@ class _FileManagePageState extends State<FileManagePage> {
                     children: [
                       const ListTile(
                         title: Row(
-                          children: [
-                            Icon(Icons.account_circle_rounded),
-                            Text("文件管理")
-                          ],
+                          children: [Icon(Icons.account_circle_rounded), Text("文件管理")],
                         ),
                       ),
                       const Divider(
@@ -43,7 +38,7 @@ class _FileManagePageState extends State<FileManagePage> {
                         endIndent: 0,
                         color: Colors.black26,
                       ),
-                       Expanded(
+                      Expanded(
                           child: ExButtonGroup(
                         titles: const ["目录A", "目录B", "目录C"],
                       )),
@@ -70,4 +65,5 @@ class _FileManagePageState extends State<FileManagePage> {
               ],
             )));
   }
+
 }

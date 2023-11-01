@@ -5,6 +5,7 @@ import 'package:share_explorer/component/ex_radio_group.dart';
 
 import '../api/user.dart';
 import '../component/ex_card.dart';
+import '../component/ex_load.dart';
 import '../entry/info.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,8 +18,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   @override
-  void initState() {
+  Widget build(BuildContext context) {
+    return widget.navigationShell;
+  }
+}
+
+class LoadPage extends StatelessWidget{
+  const LoadPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     UserOperate.info().then((value) {
       if (value.hasInit!) {
         GoRouter.of(context).replace("/file", extra: {"info": value});
@@ -26,11 +37,7 @@ class _HomePageState extends State<HomePage> {
         GoRouter.of(context).replace("/choose", extra: {"info": value});
       }
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.navigationShell;
+    return ExLoading();
   }
 }
 

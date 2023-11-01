@@ -1,13 +1,36 @@
+import 'dart:convert';
+import 'dart:io';
+
 import '../entry/info.dart';
 import '../entry/page.dart';
 import '../entry/path.dart';
 import '../entry/response.dart';
 import '../entry/user.dart';
+import '../util/http_client.dart';
 
 class UserOperate {
   static Future<InfoItem> info() async {
-    var infoItem = InfoItem(hasInit: false, remoteAddress: <String>["127.0.0.1:4565", "127.0.0.1:4566"]);
+    var url = "${HttpClient.getBaseUrl()}user/info";
+    var response = await HttpClient.get(url);
+    var data = response.data;
+    var infoItem = InfoItem.fromJson(data);
     return infoItem;
+  }
+
+  static Future<InfoItem> reset() async {
+    var url = "${HttpClient.getBaseUrl()}user/reset";
+    var response = await HttpClient.get(url);
+    var data = response.data;
+    var infoItem = InfoItem.fromJson(data);
+    return infoItem;
+  }
+
+  static Future<Response> connect({required String address}) async {
+    var url = "${HttpClient.getBaseUrl()}user/connect?address=$address";
+    var response = await HttpClient.get(url);
+    var data = response.data;
+    var res = Response.fromJson(data);
+    return res;
   }
 
   static Future<Response<ExPage<ExPath>>> queryPath({required int pageNo, required int pageSize}) async {
@@ -31,8 +54,11 @@ class UserOperate {
   static Future<Response> addAdminUser(
       {required String username, required String password, required String rePassword, required bool isNatClient, required bool isNatServer, required List<String> addresses}) async {
     var postData = {"username": username, "password": password, "rePassword": rePassword, "isNatClient": isNatClient, "isNatServer": isNatServer,"addresses":addresses};
-
-    return Response.ok();
+    var url = "${HttpClient.getBaseUrl()}user/addAdmin";
+    var response = await HttpClient.postJson(url, jsonEncode(postData));
+    var data = response.data;
+    var res = Response.fromJson(data);
+    return res;
   }
 
   static Future<Response<ExPage<ExUser>>> queryUser({required int pageNo, required int pageSize}) async {

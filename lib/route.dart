@@ -19,7 +19,7 @@ GoRouter getRoute() {
             GoRoute(
                 path: '/',
                 builder: (context, state) {
-                  return ExLoading();
+                  return const LoadPage();
                 },
                 routes: [
                   GoRoute(

@@ -5,6 +5,7 @@ import 'package:share_explorer/entry/info.dart';
 import '../../api/user.dart';
 import '../../component/ex_address_input.dart';
 import '../../component/ex_card.dart';
+import '../../component/ex_dialog.dart';
 import '../../entry/setting.dart';
 
 class ServerSetting extends StatelessWidget {
@@ -125,7 +126,11 @@ class NetSetPage extends StatelessWidget {
           body: AddressInputGroup(
               addressControllers: addressControllers,
               testCallback: (value) {
-                print(value);
+                UserOperate.connect(address: value.toString()).then((value) => {
+                  if (value.isOK())
+                    {alertDialog(context: context, msg: value.data)}
+                });
+
               }),
           footer: FooterButtonGroup(
               rightButtonText: '下一步',
@@ -164,9 +169,9 @@ class CertPage extends StatelessWidget {
       width: 400,
       height: 300,
       footer: FooterButtonGroup(
-          rightButtonText: '去登录',
+          rightButtonText: '去使用',
           onRightPressed: () {
-            GoRouter.of(context).replace("/serverLogin", extra: {"info": infoItem});
+            GoRouter.of(context).replace("/");
           },
           leftFex: 4,
           leftButtonText: '下载证书',
