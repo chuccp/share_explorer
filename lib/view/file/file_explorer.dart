@@ -2,12 +2,14 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_explorer/component/ex_path_button.dart';
 import '../../api/file.dart';
 import '../../component/ex_button_group.dart';
 import '../../component/ex_file_process.dart';
 import '../../component/ex_load.dart';
 import '../../component/file_icon_button.dart';
 import '../../entry/file.dart';
+import '../../entry/path.dart';
 import '../../entry/progress.dart';
 
 
@@ -82,7 +84,11 @@ class FilePageDelegate extends ChangeNotifier {
   String _rootPath = "";
 
   String get rootPath => _rootPath;
-
+  void reset(){
+    _focusNodes.clear();
+    _fileItems.clear();
+    _pathArrowItem.clear();
+  }
   void toPath(
       {required String path,
         required List<FileItem> fileItems,
@@ -113,15 +119,16 @@ void loadFileAsset(
       required bool isArrow}) {
   Provider.of<FilePageDelegate>(context, listen: false).disposeFocusNodes();
   FileOperate.listSync(path_: path, rootPath: rootPath).then((value) => {
-    Provider.of<FilePageDelegate>(context, listen: false).toPath(
-        path: path, fileItems: value, isArrow: isArrow, rootPath: rootPath)
+    Provider.of<FilePageDelegate>(context, listen: false).toPath(path: path, fileItems: value, isArrow: isArrow, rootPath: rootPath)
+  }).onError((error, stackTrace)=>{
+    Provider.of<FilePageDelegate>(context, listen: false).toPath(path: path, fileItems: [], isArrow: isArrow, rootPath: rootPath)
   });
 }
 
 class FileExplorer extends StatelessWidget {
-  const FileExplorer({super.key, required this.rootPath});
+  const FileExplorer({super.key, required this.exPath});
 
- final String rootPath;
+ final ExPath exPath;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +138,7 @@ class FileExplorer extends StatelessWidget {
       child:  Padding(
         padding: const EdgeInsets.fromLTRB(15, 5, 0, 0),
         child: Column(
-          children: [const _FileOperate(), const _FilePath(), Expanded(child: _FileListView(rootPath: rootPath,))],
+          children: [const _FileOperate(),  _FilePath(exPath:exPath), Expanded(child: _FileListView(rootPath: exPath.path!,))],
         ),
       ),
     );
@@ -227,7 +234,9 @@ class _TransformView extends StatelessWidget {
 }
 
 class _FilePath extends StatelessWidget {
-  const _FilePath({super.key});
+  const _FilePath( {super.key, required this.exPath});
+
+  final ExPath exPath;
 
   @override
   Widget build(BuildContext context) {
@@ -235,24 +244,40 @@ class _FilePath extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
         child: Row(
           children: [
-            const Text("返回上一级"),
+             ExPathButton(title:"返回上一级",hasPress: true,onPressed: (){},),
             Container(
               padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
               height: 12,
               child: const VerticalDivider(width: 3, color: Colors.black26, indent: 1),
             ),
-            const _PathView(),
+             _PathView(exPath: exPath,),
           ],
         ));
   }
 }
 
 class _PathView extends StatelessWidget {
-  const _PathView({super.key});
+  const _PathView({super.key, required this.exPath});
+
+  final ExPath exPath;
 
   @override
   Widget build(BuildContext context) {
-    return const Row(children: [Text("全部文件"), Text(">"), Text("全部文件")]);
+    var items = Provider.of<FilePageDelegate>(context).items;
+    final List<Widget> children = [];
+
+    children.add( ExPathButton(hasPress: items.isNotEmpty,
+      onPressed: (){}, title: exPath.name!,
+    ),);
+    children.add( const Text(">"));
+    var len = items.length;
+    for (var i=0;i<len;i++){
+      children.add( ExPathButton(hasPress: i<len-1,
+        onPressed: (){}, title: items[i].name,
+      ));
+      children.add( const Text(">"));
+    }
+    return  Row(children: children);
   }
 }
 class _FileListView extends StatefulWidget{
@@ -274,6 +299,7 @@ class _FileListViewState extends State<_FileListView> {
     var focusNodes = Provider.of<FilePageDelegate>(context).focusNodes;
     var rootPath = Provider.of<FilePageDelegate>(context).rootPath;
     if (rootPath.isEmpty || widget.rootPath!=rootPath){
+      Provider.of<FilePageDelegate>(context).reset();
       loadFileAsset(context: context, rootPath: widget.rootPath, path: "/", isArrow: false);
       return  ExLoading();
     }

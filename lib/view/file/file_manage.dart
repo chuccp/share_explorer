@@ -85,7 +85,7 @@ class _FileManagePageState extends State<FileManagePage> {
                         color: Colors.black26,
                       ),
                       Expanded(
-                          child: ExButtonGroup(titles: titles,indexCallback:(index){
+                          child: ExButtonGroup(selectIndex:selectIndex,titles: titles,indexCallback:(index){
                             _updateIndex(index);
                           })
                           ),
@@ -112,8 +112,7 @@ class _FileManagePageState extends State<FileManagePage> {
                 ),
                 Expanded(child: Builder(builder: (BuildContext context) {
                   if(selectIndex>=0){
-                    print(selectIndex);
-                    return  FileExplorer(rootPath: exPaths[selectIndex].path!,);
+                    return  FileExplorer(exPath: exPaths[selectIndex],);
                   }else{
                     return const Text("");
                   }

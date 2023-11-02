@@ -50,7 +50,7 @@ class PathItem {
     if (path_.startsWith("/") || path_.startsWith("\\")) {
       path_ = path_.substring(1);
     }
-    List<PathItem> pathItems = [PathItem("\\", "我的空间")];
+    List<PathItem> pathItems = [];
     path_ = path_.replaceAll("\\", "/");
     if (path_.isNotEmpty) {
       List<String> paths = path2.split(path_);
