@@ -57,6 +57,16 @@ class UserOperate {
     return res;
   }
 
+  static Future<Response> deletePath({required int id}) async {
+    var url = "${HttpClient.getBaseUrl()}user/deletePath";
+    var response = await HttpClient.get(url,queryParameters: {
+      "id": id,
+    });
+    var data = response.data;
+    var res = Response.fromJson(data);
+    return res;
+  }
+
 
   static Future<Response<ExPage<ExPath>>> queryAllPath() async {
     var url = "${HttpClient.getBaseUrl()}user/queryAllPath";

@@ -5,6 +5,7 @@ import '../../api/user.dart';
 import '../../component/ex_dialog.dart';
 import '../../component/ex_table.dart';
 import '../../component/ex_tree_file.dart';
+import '../../entry/path.dart';
 class PathList extends StatefulWidget{
   const PathList({super.key});
 
@@ -18,10 +19,12 @@ class _PathListState extends State<PathList> {
 
   late int pageNo;
 
+  List<ExPath>? list;
+
   void query(int pageNo){
     this.pageNo = pageNo;
     UserOperate.queryPath(pageNo: pageNo, pageSize: dataTableController.page.pageSize!).then((value) {
-      var list = value.data!.list;
+      list = value.data!.list;
       var total = value.data!.total;
       var dataList = <List<dynamic>>[
         for (var ele in list!) <dynamic>[ele.id, ele.name, ele.path]
@@ -53,7 +56,6 @@ class _PathListState extends State<PathList> {
               UserOperate.addPath(name: nameController.text,
                   path: pathController.text).then((value){
                     if(value.isOK()){
-                      print("==================");
                       query(pageNo);
                       return true;
                     }else{
@@ -64,7 +66,9 @@ class _PathListState extends State<PathList> {
             });
       },
       deleteCallback: (int index) {
-        print(index);
+        if(list!=null && list!.isNotEmpty){
+          UserOperate.deletePath(id: list![index].id!).then((value) =>  query(pageNo));
+        }
       },
       onPageChanged: (int pageNo) {
         query(pageNo);
