@@ -4,9 +4,11 @@ import '../util/json.dart';
 import 'address.dart';
 
 class InfoItem {
-  InfoItem({this.hasInit, this.remoteAddress, this.hasSignIn});
+  InfoItem({this.hasInit, this.isServer,this.remoteAddress, this.hasSignIn});
 
   bool? hasInit = false;
+
+  bool? isServer = false;
 
   bool? hasSignIn = false;
 
@@ -20,6 +22,7 @@ class InfoItem {
   factory InfoItem.fromJson(Map<String, dynamic> json) {
     return InfoItem(
         hasInit: Json.getBool(json, "hasInit"),
+        isServer: Json.getBool(json, "isServer"),
         remoteAddress: Json.getListString(json, 'remoteAddress'),
         hasSignIn: Json.getBool(json, 'hasSignIn'));
   }

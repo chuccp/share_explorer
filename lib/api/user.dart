@@ -94,6 +94,15 @@ class UserOperate {
     var res = Response.fromJson(data);
     return res;
   }
+  static Future<Response> addClient(
+      { required List<String> addresses}) async {
+    var postData = {"addresses":addresses};
+    var url = "${HttpClient.getBaseUrl()}user/addClient";
+    var response = await HttpClient.postJson(url, jsonEncode(postData));
+    var data = response.data;
+    var res = Response.fromJson(data);
+    return res;
+  }
 
   static Future<Response<ExPage<ExUser>>> queryUser({required int pageNo, required int pageSize}) async {
     var list = <Map<String, dynamic>>[

@@ -34,7 +34,11 @@ class LoadPage extends StatelessWidget{
     UserOperate.info().then((value) {
       ExCache.saveInfoItem(value);
       if (value.hasInit!) {
-        GoRouter.of(context).replace("/file", extra: {"info": value});
+        if(value.isServer!){
+          GoRouter.of(context).replace("/file", extra: {"info": value});
+        }else{
+          GoRouter.of(context).replace("/clientLogin", extra: {"info": value});
+        }
       } else {
         GoRouter.of(context).replace("/choose", extra: {"info": value});
       }

@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import '../../api/user.dart';
 import '../../component/ex_address_input.dart';
 import '../../component/ex_card.dart';
+import '../../component/ex_dialog.dart';
 import '../../entry/address.dart';
 import '../../entry/info.dart';
 
@@ -21,12 +23,20 @@ class ClientSettingPage extends StatelessWidget {
           body: AddressInputGroup(
               addressControllers: addressControllers,
               testCallback: (value) {
-                print(value);
+                UserOperate.connect(address: value.toString()).then((value) => {
+                  if (value.isOK())
+                    {alertDialog(context: context, msg: value.data)}
+                });
               }),
           footer: FooterButtonGroup(
             rightButtonText: '设置',
             onRightPressed: () {
-              GoRouter.of(context).replace("/clientLogin", extra: {"info": infoItem});
+              UserOperate.addClient(
+                  addresses: addressControllers.addressStr).then((value){
+                    if(value.isOK()){
+                      GoRouter.of(context).replace("/clientLogin", extra: {"info": infoItem});
+                    }
+              } );
             },
             leftButtonText: '上一步',
             onLeftPressed: () {
