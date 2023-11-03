@@ -59,7 +59,7 @@ class _FileSettingPageState extends State<FileSettingPage> {
                                 setState(() {
                                   selectIndex = index;
                                 });
-                              })),
+                              }, emptyTitle: '',)),
                     ],
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_explorer/component/ex_dialog.dart';
 
 import '../../api/user.dart';
@@ -39,7 +40,7 @@ class UserInfo extends StatelessWidget {
             onPressed: () {
               alertDialog(context: context, msg: "确定要重置吗?").then((value){
                 if(value!){
-                  UserOperate.reset();
+                  UserOperate.reset().then((value) => GoRouter.of(context).replace("/"));
                 }
               });
             },

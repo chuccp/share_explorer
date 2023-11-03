@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 typedef IndexCallback = void Function(int index);
 
 class ExButtonGroup extends StatefulWidget {
-  ExButtonGroup({super.key, required this.titles, this.indexCallback, this.selectIndex});
+  ExButtonGroup({super.key, required this.titles, this.indexCallback, this.selectIndex,required this.emptyTitle});
 
   final List<String> titles;
 
   IndexCallback? indexCallback;
+
+  final String emptyTitle;
 
   int? selectIndex;
 
@@ -26,6 +28,11 @@ class _ExButtonGroupState extends State<ExButtonGroup> {
 
   @override
   Widget build(BuildContext context) {
+
+    if(widget.titles.isEmpty){
+      return  Text(widget.emptyTitle);
+    }
+
     if (widget.selectIndex != null && _selectIndex < 0) {
       _selectIndex = widget.selectIndex!;
     }

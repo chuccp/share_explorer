@@ -31,4 +31,8 @@ class HttpClient {
     // }
     return "http://127.0.0.1:2156/";
   }
+
+  static postFile(String url, {required dio.FormData data, required dio.ProgressCallback onSendProgress}) async {
+    return await httpClient.post(url,data: data,onSendProgress:onSendProgress);
+  }
 }

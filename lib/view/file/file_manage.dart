@@ -87,7 +87,7 @@ class _FileManagePageState extends State<FileManagePage> {
                       Expanded(
                           child: ExButtonGroup(selectIndex:selectIndex,titles: titles,indexCallback:(index){
                             _updateIndex(index);
-                          })
+                          }, emptyTitle: '当前没有设置目录，请在左下角设置',)
                           ),
                       const Divider(
                         height: 1,
