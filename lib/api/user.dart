@@ -6,7 +6,9 @@ import '../entry/page.dart';
 import '../entry/path.dart';
 import '../entry/response.dart';
 import '../entry/user.dart';
+import '../util/download.dart';
 import '../util/http_client.dart';
+import '../util/local_store.dart';
 
 class UserOperate {
   static Future<InfoItem> info() async {
@@ -111,5 +113,11 @@ class UserOperate {
     Map<String, dynamic> data = {"total": 200, "list": list};
     Map<String, dynamic> json = {"code": 200, "data": data};
     return Response.fromJsonToUserPage(json);
+  }
+
+  static Future<void> downloadCert() async {
+    String? token = await LocalStore.getToken();
+    var url = "${HttpClient.getBaseUrl()}user/downloadCert?Token=$token";
+    downloadUrl(url);
   }
 }

@@ -7,6 +7,7 @@ import '../../component/ex_address_input.dart';
 import '../../component/ex_card.dart';
 import '../../component/ex_dialog.dart';
 import '../../entry/setting.dart';
+import '../../util/local_store.dart';
 
 class ServerSetting extends StatelessWidget {
   const ServerSetting({super.key, required this.infoItem});
@@ -127,10 +128,8 @@ class NetSetPage extends StatelessWidget {
               addressControllers: addressControllers,
               testCallback: (value) {
                 UserOperate.connect(address: value.toString()).then((value) => {
-                  if (value.isOK())
-                    {alertDialog(context: context, msg: value.data)}
-                });
-
+                      if (value.isOK()) {alertDialog(context: context, msg: value.data)}
+                    });
               }),
           footer: FooterButtonGroup(
               rightButtonText: '下一步',
@@ -144,7 +143,9 @@ class NetSetPage extends StatelessWidget {
                         addresses: addressControllers.addressStr)
                     .then((value) {
                   if (value.isOK()) {
-                    GoRouter.of(context).push("/certPage", extra: {"info": infoItem});
+                    LocalStore.saveToken(token: value.data).then((value){
+                      GoRouter.of(context).push("/certPage", extra: {"info": infoItem});
+                    });
                   }
                 });
               },
@@ -175,8 +176,10 @@ class CertPage extends StatelessWidget {
           },
           leftFex: 4,
           leftButtonText: '下载证书',
-          onLeftPressed: () {}),
-      body: const Text("远程登录的时候需要证书才能登录，避免被监听"),
+          onLeftPressed: () {
+            UserOperate.downloadCert();
+          }),
+      body: const Text("使用客户端模式登录时需要证书才能登录，对传输数据做加密处理"),
     ));
   }
 }
