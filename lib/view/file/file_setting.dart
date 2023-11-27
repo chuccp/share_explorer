@@ -21,6 +21,7 @@ class _FileSettingPageState extends State<FileSettingPage> {
   Widget build(BuildContext context) {
     return Material(
         borderOnForeground: false,
+        color: Colors.white,
         child: SizedBox(
             width: double.infinity,
             height: double.infinity,

@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 
 class FooterButtonGroup extends StatelessWidget {
-  FooterButtonGroup({super.key, required this.rightButtonText, this.leftButtonText, this.onLeftPressed, this.onRightPressed, this.leftFex});
+  FooterButtonGroup({
+    super.key,
+    required this.rightButtonText,
+    this.leftButtonText,
+    this.onLeftPressed,
+    this.onRightPressed,
+    this.leftFex,
+    this.rightFex,
+    this.width
+  });
 
   String? leftButtonText;
   String rightButtonText;
 
   int? leftFex;
+  int? rightFex;
+  double? width;
 
   final VoidCallback? onLeftPressed;
 
@@ -15,7 +26,9 @@ class FooterButtonGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var list = <Widget>[];
-    leftFex ??= 3;
+    leftFex ??= 5;
+    rightFex ??= leftFex;
+    width ??= 200;
     if (leftButtonText != null && leftButtonText!.isNotEmpty) {
       list.add(Expanded(
           flex: leftFex!,
@@ -24,12 +37,12 @@ class FooterButtonGroup extends StatelessWidget {
             child: Text(leftButtonText!),
           )));
     } else {
-      list.add(const Spacer(flex: 3));
+      list.add(const Spacer(flex: 2));
     }
     list.add(const Spacer());
     if (rightButtonText != null && rightButtonText!.isNotEmpty) {
       list.add(Expanded(
-          flex: 3,
+          flex: rightFex!,
           child: ElevatedButton(
             onPressed: onRightPressed,
             child: Text(rightButtonText!),
@@ -39,7 +52,7 @@ class FooterButtonGroup extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomRight,
       child: SizedBox(
-        width: 200,
+        width: width!,
         child: Flex(
           direction: Axis.horizontal,
           children: list,
@@ -72,7 +85,13 @@ class ExCardLayout extends StatelessWidget {
 }
 
 class ExCard extends StatelessWidget {
-  ExCard({super.key, required this.width, required this.height, required this.body, this.title, this.footer});
+  ExCard(
+      {super.key,
+      required this.width,
+      required this.height,
+      required this.body,
+      this.title,
+      this.footer});
 
   final double width;
   final double height;

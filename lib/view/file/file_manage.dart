@@ -69,7 +69,7 @@ class _FileManagePageState extends State<FileManagePage> {
             child: Row(
               children: [
                 SizedBox(
-                  width: 120,
+                  width: 140,
                   child: Column(
                     children: [
                       const ListTile(

@@ -174,7 +174,9 @@ class CertPage extends StatelessWidget {
           onRightPressed: () {
             GoRouter.of(context).replace("/");
           },
-          leftFex: 4,
+          leftFex: 9,
+          rightFex: 8,
+          width: 240,
           leftButtonText: '下载证书',
           onLeftPressed: () {
             UserOperate.downloadCert();
