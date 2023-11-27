@@ -1,15 +1,14 @@
 import 'package:path/path.dart' as path2;
 
 class FileItem {
-  FileItem({this.name, this.path, this.isDir, this.size, this.modifyTime,
-    this.isDisk});
+  FileItem({this.name, this.path, this.isDir, this.size, this.modifyTime, this.isDisk});
 
-   bool? isDir;
-   bool? isDisk;
-   String? name;
-   String? path;
-   int? size;
-   DateTime? modifyTime;
+  bool? isDir;
+  bool? isDisk;
+  String? name;
+  String? path;
+  int? size;
+  DateTime? modifyTime;
 
   factory FileItem.fromJson(Map<String, dynamic> json) {
     DateTime modify = DateTime.now();
@@ -35,7 +34,7 @@ class FileItem {
     if (json.containsKey('path')) {
       path = json['path'];
     }
-    return FileItem(name:json['name'],path: path, isDir:isDir, size:size, modifyTime:modify, isDisk:isDisk);
+    return FileItem(name: json['name'], path: path, isDir: isDir, size: size, modifyTime: modify, isDisk: isDisk);
   }
 }
 
@@ -46,11 +45,13 @@ class PathItem {
   final String name;
 
   static List<PathItem> splitPath(String path_) {
+    List<PathItem> pathItems = [];
+    pathItems.add(PathItem("\\", "\\"));
     path_ = path_.trim();
     if (path_.startsWith("/") || path_.startsWith("\\")) {
       path_ = path_.substring(1);
     }
-    List<PathItem> pathItems = [];
+
     path_ = path_.replaceAll("\\", "/");
     if (path_.isNotEmpty) {
       List<String> paths = path2.split(path_);

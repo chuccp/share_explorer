@@ -12,7 +12,7 @@ class HttpClient {
     return await httpClient.get(url,queryParameters:queryParameters, options: await getOptions());
   }
 
-  static postJson(String url, String body) async {
+  static postJson(String url, Object? body) async {
     return await httpClient.post(url, data: body, options: await getOptions());
   }
 

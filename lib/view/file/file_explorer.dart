@@ -1,10 +1,7 @@
 import 'dart:collection';
-
-
 import 'package:context_menus/context_menus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:share_explorer/component/ex_path_button.dart';
 import '../../api/file.dart';
@@ -26,7 +23,7 @@ class FilePageDelegate extends ChangeNotifier {
 
   UnmodifiableListView<PathItem> get items => UnmodifiableListView(_pathItem);
 
-  PathItem get lastItem => _pathItem[_pathItem.length - 1];
+  PathItem get lastItem =>   _pathItem[_pathItem.length - 1];
 
   PathItem _backItems() {
     var i = index - 1;
@@ -85,7 +82,9 @@ class FilePageDelegate extends ChangeNotifier {
   String _path = "";
 
   String get rootPath => _rootPath;
+
   String get path => _path;
+
   void reset() {
     _focusNodes.clear();
     _fileItems.clear();
@@ -160,6 +159,13 @@ void _uploadFile(BuildContext context, String rootPath, FilePickerResult? picker
       });
 }
 
+void createFolder({required BuildContext context, required String rootPath, required String folder}) {
+  var lastItem = Provider.of<FilePageDelegate>(context, listen: false).lastItem;
+  FileOperate.createNewFolder(path: lastItem.path, folder: folder, rootPath: rootPath).then((value) => {
+        if (value) {loadFileAsset(context: context, rootPath: rootPath, path: lastItem.path, isArrow: false)}
+      });
+}
+
 class _FileOperate extends StatelessWidget {
   const _FileOperate({super.key});
 
@@ -190,7 +196,35 @@ class _FileOperate extends StatelessWidget {
                 child: OutlinedButton.icon(
                   icon: const Icon(Icons.create_new_folder),
                   label: const Text("新建文件夹"),
-                  onPressed: () {},
+                  onPressed: () {
+                    TextEditingController unameController = TextEditingController();
+                    showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context2) => AlertDialog(
+                                title: const Text('新建文件夹'),
+                                content: TextField(
+                                  autofocus: true,
+                                  controller: unameController,
+                                  decoration: const InputDecoration(hintText: "文件名", prefixIcon: Icon(Icons.folder)),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context2, 'Cancel'),
+                                    child: const Text('取消'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      if (unameController.text.isNotEmpty) {
+                                        var rootPath = Provider.of<FilePageDelegate>(context, listen: false).rootPath;
+                                        createFolder(context: context!, rootPath: rootPath, folder: unameController.text);
+                                        unameController.clear();
+                                      }
+                                      Navigator.pop(context2, 'OK');
+                                    },
+                                    child: const Text('确认'),
+                                  ),
+                                ]));
+                  },
                 ),
               ),
               Padding(
@@ -317,7 +351,7 @@ class _PathView extends StatelessWidget {
     );
     children.add(const Text(">"));
     var len = items.length;
-    for (var i = 0; i < len; i++) {
+    for (var i = 1; i < len; i++) {
       children.add(ExPathButton(
         hasPress: i < len - 1,
         onPressed: () {},
@@ -351,58 +385,58 @@ class _FileListViewState extends State<_FileListView> {
     }
     final List<Widget> children = <Widget>[
       for (int i = 0; i < items.length; i++)
-
-    ContextMenuRegion(contextMenu:  GenericContextMenu(buttonConfigs: [ ContextMenuButtonConfig(
-      "删除",
-      onPressed: () {
-
-        print(items[i].name);
-
-
-      },
-    ),ContextMenuButtonConfig(
-      "重命名",
-      onPressed: () {
-
-        print(items[i].name);
-
-
-      },
-    ),],),
-    child: FileIconButton.fileItem(
-      fileItem: items[i],
-      focusNode: focusNodes.elementAt(i),
-      onPressed: () => {focusNodes.elementAt(i).requestFocus()},
-      onDoubleTap: () {
-        if (items[i].isDir!) {
-          loadFileAsset(context: context, rootPath: widget.rootPath, path: items[i].path!, isArrow: false);
-        } else {
-          Future.delayed(const Duration(milliseconds: 100)).then((value) {
-            // FilePicker.platform.saveFile(fileName: items[i].name).then((value) {
-            //   if (value != null && value.isNotEmpty) {
-            //     FileOperate.downLoadFile(fileItem: items[i], localPath: value);
-            //   }
-            // });
-          });
-          Provider.of<FilePageDelegate>(context, listen: false).unFocusNodes();
-        }
-      },
-    ),)
-        
-        
+        ContextMenuRegion(
+          contextMenu: GenericContextMenu(
+            buttonConfigs: [
+              ContextMenuButtonConfig(
+                "删除",
+                onPressed: () {
+                  print(items[i].name);
+                },
+              ),
+              ContextMenuButtonConfig(
+                "重命名",
+                onPressed: () {
+                  print(items[i].name);
+                },
+              ),
+            ],
+          ),
+          child: FileIconButton.fileItem(
+            fileItem: items[i],
+            focusNode: focusNodes.elementAt(i),
+            onPressed: () => {focusNodes.elementAt(i).requestFocus()},
+            onDoubleTap: () {
+              if (items[i].isDir!) {
+                loadFileAsset(context: context, rootPath: widget.rootPath, path: items[i].path!, isArrow: false);
+              } else {
+                Future.delayed(const Duration(milliseconds: 100)).then((value) {
+                  // FilePicker.platform.saveFile(fileName: items[i].name).then((value) {
+                  //   if (value != null && value.isNotEmpty) {
+                  //     FileOperate.downLoadFile(fileItem: items[i], localPath: value);
+                  //   }
+                  // });
+                });
+                Provider.of<FilePageDelegate>(context, listen: false).unFocusNodes();
+              }
+            },
+          ),
+        )
     ];
 
     return Container(
         padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
         child: GestureDetector(
           onTap: () => {},
-          child: ContextMenuOverlay(child: GridView.extent(
-            padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-            maxCrossAxisExtent: 120.0,
-            crossAxisSpacing: 5,
-            mainAxisSpacing: 5,
-            children: children,
-          ),)  ,
+          child: ContextMenuOverlay(
+            child: GridView.extent(
+              padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+              maxCrossAxisExtent: 120.0,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 5,
+              children: children,
+            ),
+          ),
         ));
   }
 }

@@ -111,7 +111,7 @@ class _FileManagePageState extends State<FileManagePage> {
                   ),
                 ),
                 Expanded(child: Builder(builder: (BuildContext context) {
-                  if(selectIndex>=0){
+                  if(selectIndex>=0 && exPaths.isNotEmpty){
                     return  FileExplorer(exPath: exPaths[selectIndex],);
                   }else{
                     return const Text("");

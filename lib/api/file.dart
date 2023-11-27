@@ -56,5 +56,21 @@ class FileOperate {
     return Future.value(false);
   }
 
+  static Future<bool> createNewFolder(
+      {required String rootPath,
+        required String path,
+        required String folder}) async {
+    var response = await HttpClient.postJson("${HttpClient.getBaseUrl()}file/createNewFolder",
+       {
+          "path": path,
+          "rootPath": rootPath,
+          "folder": folder
+        });
+    if (response.statusCode == 200) {
+      return Future.value(true);
+    }
+    return false;
+  }
+
 
 }
