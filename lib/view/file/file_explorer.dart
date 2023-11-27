@@ -216,7 +216,7 @@ class _FileOperate extends StatelessWidget {
                                     onPressed: () {
                                       if (unameController.text.isNotEmpty) {
                                         var rootPath = Provider.of<FilePageDelegate>(context, listen: false).rootPath;
-                                        createFolder(context: context!, rootPath: rootPath, folder: unameController.text);
+                                        createFolder(context: context, rootPath: rootPath, folder: unameController.text);
                                         unameController.clear();
                                       }
                                       Navigator.pop(context2, 'OK');
@@ -345,7 +345,11 @@ class _PathView extends StatelessWidget {
     children.add(
       ExPathButton(
         hasPress: items.isNotEmpty,
-        onPressed: () {},
+        onPressed: () {
+
+          loadFileAsset(context: context, rootPath: exPath.path!, path: "/", isArrow: false);
+
+        },
         title: exPath.name!,
       ),
     );
@@ -353,8 +357,10 @@ class _PathView extends StatelessWidget {
     var len = items.length;
     for (var i = 1; i < len; i++) {
       children.add(ExPathButton(
-        hasPress: i < len - 1,
-        onPressed: () {},
+        hasPress: i < (len),
+        onPressed: () {
+          loadFileAsset(context: context, rootPath: exPath.path!, path: items[i].path, isArrow: false);
+        },
         title: items[i].name,
       ));
       children.add(const Text(">"));
