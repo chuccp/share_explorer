@@ -11,8 +11,9 @@ class Json {
   static DateTime? getDateTime(Map<String, dynamic> json, String key) {
     if (json.containsKey(key)) {
       var value = json[key];
-      if (value is DateTime) {
-        return value;
+      var dateTime = DateTime.tryParse(value);
+      if (dateTime!=null) {
+        return dateTime;
       }
     }
     return null;

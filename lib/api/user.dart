@@ -35,17 +35,13 @@ class UserOperate {
     return res;
   }
 
-
-
-  static Future<Response<ExPage<ExPath>>> queryPath(
-      {required int pageNo, required int pageSize}) async {
+  static Future<Response<ExPage<ExPath>>> queryPath({required int pageNo, required int pageSize}) async {
     var url = "${HttpClient.getBaseUrl()}user/queryPath?pageNo=$pageNo&pageSize=$pageSize";
     var response = await HttpClient.get(url);
     var data = response.data;
     var res = Response.fromJsonToPathPage(data);
     return res;
   }
-
 
   static Future<Response> addPath({required String name, required String path}) async {
     var url = "${HttpClient.getBaseUrl()}user/addPath";
@@ -59,9 +55,22 @@ class UserOperate {
     return res;
   }
 
+  static Future<Response> editPath({required int id, required String name, required String path}) async {
+    var url = "${HttpClient.getBaseUrl()}user/editPath";
+    var postData = {
+      "name": name,
+      "id": id,
+      "path": path,
+    };
+    var response = await HttpClient.postJson(url, jsonEncode(postData));
+    var data = response.data;
+    var res = Response.fromJson(data);
+    return res;
+  }
+
   static Future<Response> deletePath({required int id}) async {
     var url = "${HttpClient.getBaseUrl()}user/deletePath";
-    var response = await HttpClient.get(url,queryParameters: {
+    var response = await HttpClient.get(url, queryParameters: {
       "id": id,
     });
     var data = response.data;
@@ -69,12 +78,21 @@ class UserOperate {
     return res;
   }
 
-
   static Future<Response<ExPage<ExPath>>> queryAllPath() async {
     var url = "${HttpClient.getBaseUrl()}user/queryAllPath";
     var response = await HttpClient.get(url);
     var data = response.data;
     var res = Response.fromJsonToPathPage(data);
+    return res;
+  }
+
+  static Future<Response<ExPath>> queryOnePath({required int id}) async {
+    var url = "${HttpClient.getBaseUrl()}user/queryOnePath";
+    var response = await HttpClient.get(url, queryParameters: {
+      "id": id,
+    });
+    var data = response.data;
+    var res = Response.fromJsonToPath(data);
     return res;
   }
 
@@ -89,16 +107,16 @@ class UserOperate {
 
   static Future<Response> addAdminUser(
       {required String username, required String password, required String rePassword, required bool isNatClient, required bool isNatServer, required List<String> addresses}) async {
-    var postData = {"username": username, "password": password, "rePassword": rePassword, "isNatClient": isNatClient, "isNatServer": isNatServer,"addresses":addresses};
+    var postData = {"username": username, "password": password, "rePassword": rePassword, "isNatClient": isNatClient, "isNatServer": isNatServer, "addresses": addresses};
     var url = "${HttpClient.getBaseUrl()}user/addAdmin";
     var response = await HttpClient.postJson(url, jsonEncode(postData));
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
   }
-  static Future<Response> addClient(
-      { required List<String> addresses}) async {
-    var postData = {"addresses":addresses};
+
+  static Future<Response> addClient({required List<String> addresses}) async {
+    var postData = {"addresses": addresses};
     var url = "${HttpClient.getBaseUrl()}user/addClient";
     var response = await HttpClient.postJson(url, jsonEncode(postData));
     var data = response.data;
@@ -107,12 +125,11 @@ class UserOperate {
   }
 
   static Future<Response<ExPage<ExUser>>> queryUser({required int pageNo, required int pageSize}) async {
-    var list = <Map<String, dynamic>>[
-      for (var i = 0; i < pageSize; i++) {"id": i + (pageNo * pageSize), "username": "name_${pageNo}_$i", "createTime": 0}
-    ];
-    Map<String, dynamic> data = {"total": 200, "list": list};
-    Map<String, dynamic> json = {"code": 200, "data": data};
-    return Response.fromJsonToUserPage(json);
+    var url = "${HttpClient.getBaseUrl()}user/queryUser?pageNo=$pageNo&pageSize=$pageSize";
+    var response = await HttpClient.get(url);
+    var data = response.data;
+    var res = Response.fromJsonToUserPage(data);
+    return res;
   }
 
   static Future<void> downloadCert() async {

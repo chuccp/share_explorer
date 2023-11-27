@@ -23,7 +23,10 @@ class ExPath {
     return ExPath(
         id: Json.getInt(json, "id"),
         name: Json.getString(json, "name"),
-        path: Json.getString(json, "path"));
+        path: Json.getString(json, "path"),
+      createTime: Json.getDateTime(json, "updateTime"),
+      updateTime: Json.getDateTime(json, "updateTime"),
+    );
   }
 
   static List<ExPath> fromListJson(List<dynamic> json) {

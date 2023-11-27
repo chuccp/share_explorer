@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_explorer/component/ex_checkbox_list.dart';
 
@@ -11,12 +10,14 @@ class UserList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DataTableController dataTableController = DataTableController(columnNames: ["ID", "用户", "创建时间"]);
+    DataTableController dataTableController =
+        DataTableController(columnNames: ["ID", "用户", "角色", "创建时间"]);
     UserOperate.queryUser(pageNo: 1, pageSize: 10).then((value) {
       var list = value.data!.list;
       var total = value.data!.total;
       var dataList = <List<dynamic>>[
-        for (var ele in list!) <dynamic>[ele.id, ele.username, ele.createTime]
+        for (var ele in list!)
+          <dynamic>[ele.id, ele.username, ele.role, ele.createTime]
       ];
       dataTableController.updateTable(dataList, total!, 1);
     });
@@ -43,7 +44,8 @@ class UserList extends StatelessWidget {
           var list = value.data!.list;
           var total = value.data!.total;
           var dataList = <List<dynamic>>[
-            for (var ele in list!) <dynamic>[ele.id, ele.username, ele.createTime]
+            for (var ele in list!)
+              <dynamic>[ele.id, ele.username, ele.role, ele.createTime]
           ];
           dataTableController.updateTable(dataList, total!, pageNo);
         });
@@ -53,7 +55,8 @@ class UserList extends StatelessWidget {
 }
 
 class _AddUserView extends StatelessWidget {
-  const _AddUserView({required this.usernameController, required this.passwordController});
+  const _AddUserView(
+      {required this.usernameController, required this.passwordController});
 
   final TextEditingController usernameController;
 
@@ -61,14 +64,7 @@ class _AddUserView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ExCheckboxController exCheckboxController = ExCheckboxController([
-      CheckboxNode(id: 0, name: "aaa"),
-      CheckboxNode(id: 1, name: "aaa"),
-      CheckboxNode(id: 2, name: "aaa"),
-      CheckboxNode(id: 3, name: "aaa"),
-      CheckboxNode(id: 4, name: "aaa"),
-      CheckboxNode(id: 5, name: "aaa")
-    ]);
+    ExCheckboxController exCheckboxController = ExCheckboxController([]);
     return SizedBox(
       height: 375,
       width: 400,

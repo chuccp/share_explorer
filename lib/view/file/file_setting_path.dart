@@ -6,12 +6,12 @@ import '../../component/ex_dialog.dart';
 import '../../component/ex_table.dart';
 import '../../component/ex_tree_file.dart';
 import '../../entry/path.dart';
-class PathList extends StatefulWidget{
+
+class PathList extends StatefulWidget {
   const PathList({super.key});
 
   @override
-  State<StatefulWidget> createState() =>_PathListState();
-
+  State<StatefulWidget> createState() => _PathListState();
 }
 
 class _PathListState extends State<PathList> {
@@ -21,7 +21,7 @@ class _PathListState extends State<PathList> {
 
   List<ExPath>? list;
 
-  void query(int pageNo){
+  void query(int pageNo) {
     this.pageNo = pageNo;
     UserOperate.queryPath(pageNo: pageNo, pageSize: dataTableController.page.pageSize!).then((value) {
       list = value.data!.list;
@@ -32,6 +32,7 @@ class _PathListState extends State<PathList> {
       dataTableController.updateTable(dataList, total!, pageNo);
     });
   }
+
   @override
   void initState() {
     query(1);
@@ -39,7 +40,6 @@ class _PathListState extends State<PathList> {
 
   @override
   Widget build(BuildContext context) {
-
     return ExTable(
       dataTableController: dataTableController,
       addCallback: () {
@@ -53,22 +53,40 @@ class _PathListState extends State<PathList> {
               pathController: pathController,
             ),
             onPressed: () {
-              UserOperate.addPath(name: nameController.text,
-                  path: pathController.text).then((value){
-                    if(value.isOK()){
-                      query(pageNo);
-                      return true;
-                    }else{
-                      return false;
-                    }
+              UserOperate.addPath(name: nameController.text, path: pathController.text).then((value) {
+                if (value.isOK()) {
+                  query(pageNo);
+                  return true;
+                } else {
+                  return false;
+                }
               });
               return Future(() => true);
             });
       },
       deleteCallback: (int index) {
-        if(list!=null && list!.isNotEmpty){
-          UserOperate.deletePath(id: list![index].id!).then((value) =>  query(pageNo));
+        if (list != null && list!.isNotEmpty) {
+          UserOperate.deletePath(id: list![index].id!).then((value) => query(pageNo));
         }
+      },
+      editCallback: (int index) {
+        TextEditingController nameController = TextEditingController();
+        TextEditingController pathController = TextEditingController();
+        exShowDialog(
+            title: const Text("修改路径"),
+            context: context,
+            content: _AddPathView(nameController: nameController, pathController: pathController, id: list![index].id!),
+            onPressed: () {
+              UserOperate.editPath(id:list![index].id!,name: nameController.text, path: pathController.text).then((value) {
+                if (value.isOK()) {
+                  query(pageNo);
+                  return true;
+                } else {
+                  return false;
+                }
+              });
+              return Future(() => true);
+            });
       },
       onPageChanged: (int pageNo) {
         query(pageNo);
@@ -78,14 +96,25 @@ class _PathListState extends State<PathList> {
 }
 
 class _AddPathView extends StatelessWidget {
-  const _AddPathView({required this.nameController, required this.pathController});
+  _AddPathView({required this.nameController, required this.pathController, this.id});
 
   final TextEditingController nameController;
 
   final TextEditingController pathController;
 
+  int? id;
+
   @override
   Widget build(BuildContext context) {
+    if (id != null) {
+      UserOperate.queryOnePath(id: id!).then((value) {
+        ExPath? exPath = value.data;
+        if (exPath != null) {
+          nameController.text = exPath.name!;
+          pathController.text = exPath.path!;
+        }
+      });
+    }
     return SizedBox(
       height: 600,
       width: 400,
