@@ -9,8 +9,19 @@ class CheckboxNode {
 }
 
 class ExCheckboxController extends ValueNotifier<List<CheckboxNode>> {
-  ExCheckboxController(super.value);
+  ExCheckboxController(super._value);
 
+  String _selectIds() {
+    String sb = "";
+    for (var element in value) {
+      if (element.select) {
+        sb = "$sb,${element.id}";
+      }
+    }
+    return sb;
+  }
+
+  String get selectIds => _selectIds();
 }
 
 class ExCheckboxList extends StatefulWidget {

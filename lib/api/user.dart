@@ -1,6 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
+
+import '../component/ex_dialog.dart';
 import '../entry/info.dart';
 import '../entry/page.dart';
 import '../entry/path.dart';
@@ -124,11 +126,35 @@ class UserOperate {
     return res;
   }
 
+  static Future<Response> addUser({required String username, required String password, required String pathIds}) async {
+    var postData = {"username": username, "password": password, "pathIds": pathIds};
+    var url = "${HttpClient.getBaseUrl()}user/addUser";
+    var response = await HttpClient.postJson(url, postData);
+    var data = response.data;
+    var res = Response.fromJson(data);
+    return res;
+  }
+
   static Future<Response<ExPage<ExUser>>> queryUser({required int pageNo, required int pageSize}) async {
     var url = "${HttpClient.getBaseUrl()}user/queryUser?pageNo=$pageNo&pageSize=$pageSize";
     var response = await HttpClient.get(url);
     var data = response.data;
     var res = Response.fromJsonToUserPage(data);
+    return res;
+  }
+
+  static Future<Response> deleteUser({required BuildContext context,required String username}) async {
+    var url = "${HttpClient.getBaseUrl()}user/deleteUser";
+    var response = await HttpClient.get(url, queryParameters: {
+      "username": username,
+    });
+    var data = response.data;
+    var res = Response.fromJson(data);
+
+    if(!res.isOK()){
+       alertDialog(context: context, msg: res.error!);
+    }
+
     return res;
   }
 

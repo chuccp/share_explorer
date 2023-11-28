@@ -66,7 +66,9 @@ class _PathListState extends State<PathList> {
       },
       deleteCallback: (int index) {
         if (list != null && list!.isNotEmpty) {
-          UserOperate.deletePath(id: list![index].id!).then((value) => query(pageNo));
+          alertDialog(context: context, msg: '确认删除吗?').then((value) => {
+                if (value!) {UserOperate.deletePath(id: list![index].id!).then((value) => query(pageNo))}
+              });
         }
       },
       editCallback: (int index) {
@@ -77,7 +79,7 @@ class _PathListState extends State<PathList> {
             context: context,
             content: _AddPathView(nameController: nameController, pathController: pathController, id: list![index].id!),
             onPressed: () {
-              UserOperate.editPath(id:list![index].id!,name: nameController.text, path: pathController.text).then((value) {
+              UserOperate.editPath(id: list![index].id!, name: nameController.text, path: pathController.text).then((value) {
                 if (value.isOK()) {
                   query(pageNo);
                   return true;

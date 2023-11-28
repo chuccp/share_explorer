@@ -7,17 +7,18 @@ import 'package:share_explorer/entry/user.dart';
 import '../util/json.dart';
 
 class Response<T> {
-  Response({this.code, this.data});
+  Response({this.code, this.data,this.error});
 
   int? code;
   T? data;
+  String? error;
 
   bool isOK() {
     return code == 200;
   }
 
   factory Response.fromJson(Map<String, dynamic> json) {
-    return Response(code: Json.getInt(json, "code"), data: Json.getDynamic(json, "data"));
+    return Response(code: Json.getInt(json, "code"), data: Json.getDynamic(json, "data"),error:Json.getString(json, "error") );
   }
 
   static Response<String> ok() {
@@ -27,6 +28,7 @@ class Response<T> {
   static Response<ExPage<ExPath>> fromJsonToPathPage(Map<String, dynamic> json) {
     var page = Response<ExPage<ExPath>>();
     page.code = Json.getInt(json, "code");
+    page.error = Json.getString(json, "error");
     var data = Json.getDynamic(json, "data");
     page.data = ExPage.fromPathJson(data);
     return page;
@@ -35,7 +37,9 @@ class Response<T> {
   static Response<ExPath> fromJsonToPath(Map<String, dynamic> json) {
     var exPath = Response<ExPath>();
     exPath.code = Json.getInt(json, "code");
+    exPath.error = Json.getString(json, "error");
     var data = Json.getDynamic(json, "data");
+
     exPath.data = ExPath.fromJson(data);
     return exPath;
   }
@@ -43,6 +47,7 @@ class Response<T> {
   static Response<ExPage<ExUser>> fromJsonToUserPage(Map<String, dynamic> json) {
     var page = Response<ExPage<ExUser>>();
     page.code = Json.getInt(json, "code");
+    page.error = Json.getString(json, "error");
     var data = Json.getDynamic(json, "data");
     page.data = ExPage.fromUserJson(data);
     return page;
