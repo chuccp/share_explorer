@@ -1,11 +1,15 @@
 import '../util/json.dart';
 
 class ExUser {
-  ExUser({this.id, this.username, this.role, this.createTime, this.updateTime});
+  ExUser({this.id, this.username, this.password,this.role, this.pathIds,this.createTime, this.updateTime});
 
   int? id;
 
   String? username;
+
+  String? password;
+
+  String? pathIds;
 
   String? role;
 
@@ -17,6 +21,8 @@ class ExUser {
     return ExUser(
         id: Json.getInt(json, "id"),
         username: Json.getString(json, "username"),
+        password: Json.getString(json, "password"),
+        pathIds: Json.getString(json, "pathIds"),
         role: Json.getString(json, "role"),
         createTime: Json.getDateTime(json, "createTime"),
         updateTime: Json.getDateTime(json, "updateTime"));

@@ -6,6 +6,15 @@ class ExFileSelect extends StatelessWidget {
 
   final String labelText;
 
+   void select(TextEditingController controller){
+     Future<FilePickerResult?> result = FilePicker.platform.pickFiles(withReadStream: true);
+     result.then((value) {
+       if (value != null && value.names.isNotEmpty) {
+         controller.text = value.names[0]!;
+       }
+     });
+  }
+
   @override
   Widget build(BuildContext context) {
     TextEditingController controller = TextEditingController(text: "");
@@ -13,12 +22,7 @@ class ExFileSelect extends StatelessWidget {
       children: [
         ElevatedButton(
           onPressed: () {
-            Future<FilePickerResult?> result = FilePicker.platform.pickFiles(withReadStream: true);
-            result.then((value) {
-              if (value != null && value.names.isNotEmpty) {
-                controller.text = value.names[0]!;
-              }
-            });
+            select(controller);
           },
           child: const Text("选择"),
         ),
@@ -30,6 +34,9 @@ class ExFileSelect extends StatelessWidget {
             decoration: InputDecoration(
               labelText: labelText,
             ),
+            onTap: (){
+              select(controller);
+            },
           ),
         )
       ],

@@ -21,6 +21,20 @@ class ExCheckboxController extends ValueNotifier<List<CheckboxNode>> {
     return sb;
   }
 
+   set selectIds(String ids){
+    var idArray = ids.split(",");
+     for (var element in value) {
+       element.select = false;
+       for(var id in  idArray){
+         if(id.isNotEmpty && element.id==int.parse(id)){
+           element.select = true;
+           break;
+         }
+       }
+     }
+       notifyListeners();
+   }
+
   String get selectIds => _selectIds();
 }
 

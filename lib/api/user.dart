@@ -143,20 +143,35 @@ class UserOperate {
     return res;
   }
 
-  static Future<Response> deleteUser({required BuildContext context,required String username}) async {
+  static Future<Response<ExUser>> queryOneUser({required int userId}) async {
+    var url = "${HttpClient.getBaseUrl()}user/queryOneUser";
+    var response = await HttpClient.get(url,queryParameters: {"userId":userId});
+    var data = response.data;
+    var res = Response.fromJsonToUser(data);
+    return res;
+  }
+
+  static Future<Response> deleteUser({required String username}) async {
     var url = "${HttpClient.getBaseUrl()}user/deleteUser";
     var response = await HttpClient.get(url, queryParameters: {
       "username": username,
     });
     var data = response.data;
     var res = Response.fromJson(data);
-
-    if(!res.isOK()){
-       alertDialog(context: context, msg: res.error!);
-    }
-
     return res;
   }
+
+  static Future<Response> signIn({required String username,required String password}) async {
+    var url = "${HttpClient.getBaseUrl()}user/signIn";
+    var response = await HttpClient.postJson(url,  {
+      "username": username,
+      "password":password
+    });
+    var data = response.data;
+    var res = Response.fromJson(data);
+    return res;
+  }
+
 
   static Future<void> downloadCert() async {
     String? token = await LocalStore.getToken();

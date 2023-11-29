@@ -47,7 +47,7 @@ class _UserListState extends State<UserList> {
         exShowDialog(
             title: const Text("添加用户"),
             context: context,
-            content: _AddUserView(usernameController: usernameController, passwordController: passwordController, exCheckboxController: exCheckboxController),
+            content: _AddUserView(usernameController: usernameController, passwordController: passwordController, exCheckboxController: exCheckboxController,),
             onPressed: () {
               return UserOperate.addUser(username: usernameController.text, password: passwordController.text, pathIds: exCheckboxController.selectIds).then((value) {
                 if (value.isOK()) {
@@ -61,12 +61,40 @@ class _UserListState extends State<UserList> {
       },
       deleteCallback: (index) {
         if (list != null && list!.isNotEmpty) {
+
           alertDialog(context: context, msg: '确认删除吗?').then((value) => {
-                if (value!) {UserOperate.deleteUser(context: context, username: list![index].username!).then((value) => query(pageNo))}
+                if (value!) {UserOperate.deleteUser(username: list![index].username!).then((value){
+                  if(value.isOK()){
+                    query(pageNo);
+                  }else{
+                    alertError(context: context, msg: value.error!);
+                  }
+                })}
               });
         }
       },
-      editCallback: (index) {},
+      editCallback: (index) {
+
+        TextEditingController usernameController = TextEditingController();
+        TextEditingController passwordController = TextEditingController();
+        ExCheckboxController exCheckboxController = ExCheckboxController([]);
+        exShowDialog(
+            title: const Text("编辑用户"),
+            context: context,
+            content: _AddUserView(usernameController: usernameController, passwordController: passwordController, exCheckboxController: exCheckboxController,userId:list![index].id ),
+            onPressed: () {
+              return UserOperate.addUser(username: usernameController.text, password: passwordController.text, pathIds: exCheckboxController.selectIds).then((value) {
+                if (value.isOK()) {
+                  query(pageNo);
+                  return true;
+                } else {
+                  return false;
+                }
+              });
+            });
+
+
+      },
       onPageChanged: (int pageNo) {
         UserOperate.queryUser(pageNo: pageNo, pageSize: 10).then((value) {
           var list = value.data!.list;
@@ -82,7 +110,8 @@ class _UserListState extends State<UserList> {
 }
 
 class _AddUserView extends StatelessWidget {
-  const _AddUserView({required this.usernameController, required this.passwordController, required this.exCheckboxController});
+
+   _AddUserView({required this.usernameController, required this.passwordController, required this.exCheckboxController,this.userId});
 
   final TextEditingController usernameController;
 
@@ -90,11 +119,22 @@ class _AddUserView extends StatelessWidget {
 
   final ExCheckboxController exCheckboxController;
 
+  int? userId;
+
   @override
   Widget build(BuildContext context) {
     UserOperate.queryAllPath().then((value) {
       var checkboxNodeList = <CheckboxNode>[for (var exPath in value.data!.list!) CheckboxNode(id: exPath.id, name: exPath.name)];
       exCheckboxController.value = checkboxNodeList;
+      if(userId!=null){
+        UserOperate.queryOneUser(userId: userId!).then((value){
+          if(value.isOK()){
+            usernameController.text = value.data!.username!;
+            passwordController.text = value.data!.password!;
+            exCheckboxController.selectIds = value.data!.pathIds!;
+        }
+        });
+      }
     });
     return SizedBox(
       height: 375,

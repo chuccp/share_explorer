@@ -44,6 +44,15 @@ class Response<T> {
     return exPath;
   }
 
+  static Response<ExUser> fromJsonToUser(Map<String, dynamic> json) {
+    var exPath = Response<ExUser>();
+    exPath.code = Json.getInt(json, "code");
+    exPath.error = Json.getString(json, "error");
+    var data = Json.getDynamic(json, "data");
+    exPath.data = ExUser.fromJson(data) ;
+    return exPath;
+  }
+
   static Response<ExPage<ExUser>> fromJsonToUserPage(Map<String, dynamic> json) {
     var page = Response<ExPage<ExUser>>();
     page.code = Json.getInt(json, "code");
