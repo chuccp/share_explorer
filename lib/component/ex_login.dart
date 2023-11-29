@@ -1,21 +1,38 @@
 import 'package:flutter/material.dart';
-
+import 'package:file_picker/file_picker.dart';
 import 'ex_file_select.dart';
 
 
 
 class ExLoginInfo{
-  const ExLoginInfo({required this.username,required this.password});
-  static const ExLoginInfo empty = ExLoginInfo(username: '', password: '');
+   ExLoginInfo( { this.useSelected, this.saveSelected, this.username, this.password});
+  static  ExLoginInfo empty = ExLoginInfo(username: '', password: '', useSelected: false, saveSelected: false);
 
-  final String username;
+   String? username;
 
-  final String password;
+   String? password;
+
+   bool? useSelected;
+
+   bool? saveSelected;
+
+   FilePickerResult? filePickerResult;
 
 }
 
 class ExLoginController extends ValueNotifier<ExLoginInfo>{
   ExLoginController():super(ExLoginInfo.empty);
+
+  set username(String username){
+    value.username = username;
+  }
+  set password(String password){
+    value.password = password;
+  }
+
+  set filePickerResult(FilePickerResult? filePickerResult){
+    value.filePickerResult = filePickerResult;
+  }
 
 }
 
@@ -38,24 +55,36 @@ class _ExLoginState extends State<ExLogin> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(valueListenable: widget.exLoginController, builder: (BuildContext context, value, Widget? child) {
+      TextEditingController usernameController = TextEditingController();
+      usernameController.addListener(() {
+        widget.exLoginController.username = usernameController.text;
+      });
+      TextEditingController passwordController = TextEditingController();
+      passwordController.addListener(() {
+        widget.exLoginController.password = passwordController.text;
+      });
       return Container(
         padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
         child: Column(
           children: [
-            const TextField(
-              decoration: InputDecoration(
+             TextField(
+              controller: usernameController,
+              decoration: const InputDecoration(
                 labelText: "账号",
               ),
             ),
-            const TextField(
+             TextField(
+              controller: passwordController,
               obscureText: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "密码",
               ),
             ),
             if(!widget.isServer!)
-              const ExFileSelect(
-                labelText: '证书文件',
+               ExFileSelect(
+                labelText: '证书文件', filePickerCallback: (FilePickerResult? value) {
+                 widget.exLoginController.filePickerResult = value;
+              },
               ),
             CheckboxListTile(
               controlAffinity: ListTileControlAffinity.leading,
