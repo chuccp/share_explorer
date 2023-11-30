@@ -35,7 +35,7 @@ class _ServerLoginState extends State<ServerLoginPage> {
               onRightPressed: () {
                 UserOperate.signIn(username: exLoginController.username, password: exLoginController.password).then((value) {
                   if (value.isOK()) {
-                    LocalStore.saveToken(token: value.data).then((value) {
+                    LocalStore.saveToken(token: value.data,expires: const Duration(days: 1)).then((value) {
                       GoRouter.of(context).replace("/file", extra: {"info": widget.infoItem});
                     });
                   }

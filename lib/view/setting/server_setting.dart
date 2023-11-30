@@ -143,7 +143,7 @@ class NetSetPage extends StatelessWidget {
                         addresses: addressControllers.addressStr)
                     .then((value) {
                   if (value.isOK()) {
-                    LocalStore.saveToken(token: value.data).then((value){
+                    LocalStore.saveToken(token: value.data,expires: const Duration(days: 1)).then((value){
                       GoRouter.of(context).push("/certPage", extra: {"info": infoItem});
                     });
                   }
