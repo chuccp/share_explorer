@@ -19,14 +19,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   Widget build(BuildContext context) {
     return widget.navigationShell;
   }
 }
 
-class LoadPage extends StatelessWidget{
+class LoadPage extends StatelessWidget {
   const LoadPage({super.key});
 
   @override
@@ -34,10 +33,14 @@ class LoadPage extends StatelessWidget{
     UserOperate.info().then((value) {
       ExCache.saveInfoItem(value);
       if (value.hasInit!) {
-        if(value.isServer!){
-          GoRouter.of(context).replace("/serverLogin", extra: {"info": value});
-        }else{
-          GoRouter.of(context).replace("/clientLogin", extra: {"info": value});
+        if (value.hasSignIn!) {
+          GoRouter.of(context).replace("/file", extra: {"info": value});
+        } else {
+          if (value.isServer!) {
+            GoRouter.of(context).replace("/serverLogin", extra: {"info": value});
+          } else {
+            GoRouter.of(context).replace("/clientLogin", extra: {"info": value});
+          }
         }
       } else {
         GoRouter.of(context).replace("/choose", extra: {"info": value});
