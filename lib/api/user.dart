@@ -135,6 +135,15 @@ class UserOperate {
     return res;
   }
 
+  static Future<Response> editUser({required int id,required String username, required String password, required String pathIds}) async {
+    var postData = {"id":id,"username": username, "password": password, "pathIds": pathIds};
+    var url = "${HttpClient.getBaseUrl()}user/editUser";
+    var response = await HttpClient.postJson(url, postData);
+    var data = response.data;
+    var res = Response.fromJson(data);
+    return res;
+  }
+
   static Future<Response<ExPage<ExUser>>> queryUser({required int pageNo, required int pageSize}) async {
     var url = "${HttpClient.getBaseUrl()}user/queryUser?pageNo=$pageNo&pageSize=$pageSize";
     var response = await HttpClient.get(url);
