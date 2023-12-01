@@ -1,3 +1,4 @@
+import 'package:share_explorer/entry/node.dart';
 import 'package:share_explorer/entry/path.dart';
 import 'package:share_explorer/entry/user.dart';
 
@@ -23,6 +24,13 @@ class ExPage<T> {
     var exPage = ExPage<ExUser>();
     exPage.total = Json.getInt(json, "total");
     exPage.list = ExUser.fromListJson(Json.getListDynamic(json, "list"));
+    return exPage;
+  }
+
+  static ExPage<ExNode> fromNodeJson(Map<String, dynamic> json) {
+    var exPage = ExPage<ExNode>();
+    exPage.total = Json.getInt(json, "total");
+    exPage.list = ExNode.fromListJson(Json.getListDynamic(json, "list"));
     return exPage;
   }
 

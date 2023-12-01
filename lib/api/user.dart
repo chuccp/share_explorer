@@ -98,15 +98,6 @@ class UserOperate {
     return res;
   }
 
-  static Future<Response<ExPage<Map<String, dynamic>>>> queryJsonPath({required int pageNo, required int pageSize}) async {
-    var list = <Map<String, dynamic>>[
-      for (var i = 0; i < pageSize; i++) {"id": i + (pageNo * pageSize), "name": "name_${pageNo}_$i", "path": "path_${pageNo}_$i"}
-    ];
-    Map<String, dynamic> data = {"total": 200, "list": list};
-    Map<String, dynamic> json = {"code": 200, "data": data};
-    return Response.fromJson(json);
-  }
-
   static Future<Response> addAdminUser(
       {required String username, required String password, required String rePassword, required bool isNatClient, required bool isNatServer, required List<String> addresses}) async {
     var postData = {"username": username, "password": password, "rePassword": rePassword, "isNatClient": isNatClient, "isNatServer": isNatServer, "addresses": addresses};
@@ -135,8 +126,8 @@ class UserOperate {
     return res;
   }
 
-  static Future<Response> editUser({required int id,required String username, required String password, required String pathIds}) async {
-    var postData = {"id":id,"username": username, "password": password, "pathIds": pathIds};
+  static Future<Response> editUser({required int id, required String username, required String password, required String pathIds}) async {
+    var postData = {"id": id, "username": username, "password": password, "pathIds": pathIds};
     var url = "${HttpClient.getBaseUrl()}user/editUser";
     var response = await HttpClient.postJson(url, postData);
     var data = response.data;
@@ -154,7 +145,7 @@ class UserOperate {
 
   static Future<Response<ExUser>> queryOneUser({required int userId}) async {
     var url = "${HttpClient.getBaseUrl()}user/queryOneUser";
-    var response = await HttpClient.get(url,queryParameters: {"userId":userId});
+    var response = await HttpClient.get(url, queryParameters: {"userId": userId});
     var data = response.data;
     var res = Response.fromJsonToUser(data);
     return res;
@@ -170,17 +161,13 @@ class UserOperate {
     return res;
   }
 
-  static Future<Response> signIn({required String username,required String password}) async {
+  static Future<Response> signIn({required String username, required String password}) async {
     var url = "${HttpClient.getBaseUrl()}user/signIn";
-    var response = await HttpClient.postJson(url,  {
-      "username": username,
-      "password":password
-    });
+    var response = await HttpClient.postJson(url, {"username": username, "password": password});
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
   }
-
 
   static Future<void> downloadCert() async {
     String? token = await LocalStore.getToken();

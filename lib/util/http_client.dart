@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import 'local_store.dart';
 
@@ -26,9 +27,9 @@ class HttpClient {
   }
 
   static String getBaseUrl() {
-    // if (kReleaseMode) {
-    //   return "/";
-    // }
+    if (kReleaseMode) {
+      return "/";
+    }
     return "http://127.0.0.1:2156/";
   }
 

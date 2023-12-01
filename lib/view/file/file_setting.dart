@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share_explorer/component/ex_load.dart';
 
 import '../../component/ex_button_group.dart';
+import '../net/register_list.dart';
 import 'file_setting_path.dart';
 import 'file_setting_user.dart';
 import 'file_user_info.dart';
@@ -55,7 +56,7 @@ class _FileSettingPageState extends State<FileSettingPage> {
                       Expanded(
                           child: ExButtonGroup(
                               selectIndex: selectIndex,
-                              titles: const ["用户管理", "目录管理", "个人中心"],
+                              titles: const ["用户管理", "目录管理", "个人中心","NAT列表"],
                               indexCallback: (index) {
                                 setState(() {
                                   selectIndex = index;
@@ -77,6 +78,9 @@ class _FileSettingPageState extends State<FileSettingPage> {
                       }
                       if (selectIndex == 2) {
                         return const UserInfo();
+                      }
+                      if (selectIndex == 3) {
+                        return const RegisterList();
                       }
                       return ExLoading();
                     },

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:share_explorer/entry/node.dart';
 import 'package:share_explorer/entry/page.dart';
 import 'package:share_explorer/entry/path.dart';
 import 'package:share_explorer/entry/user.dart';
@@ -61,4 +62,14 @@ class Response<T> {
     page.data = ExPage.fromUserJson(data);
     return page;
   }
+
+  static Response<ExPage<ExNode>> fromJsonToNodePage(Map<String, dynamic> json) {
+    var page = Response<ExPage<ExNode>>();
+    page.code = Json.getInt(json, "code");
+    page.error = Json.getString(json, "error");
+    var data = Json.getDynamic(json, "data");
+    page.data = ExPage.fromNodeJson(data);
+    return page;
+  }
+
 }
