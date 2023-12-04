@@ -7,7 +7,4 @@ class ServerSettingItem {
   String? password;
   String? rePassword;
   List<String> remoteAddresses = [];
-
-
-
 }

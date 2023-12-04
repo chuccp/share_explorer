@@ -16,16 +16,18 @@ class ClientLoginPage extends StatefulWidget {
 class _ClientLoginState extends State<ClientLoginPage> {
   @override
   Widget build(BuildContext context) {
-    ExLoginController exLoginController =  ExLoginController();
+    ExLoginController exLoginController = ExLoginController();
     return ExCardLayout(
       child: ExCard(
           width: 400,
           height: 412,
           title: "客户端登录",
           body: ExLogin(
-            isServer: false, exLoginController: exLoginController,
+            isServer: true,
+            exLoginController: exLoginController,
           ),
-          footer: FooterButtonGroup(rightButtonText: '登录', onRightPressed: () {})),
+          // footer: FooterButtonGroup(width: 240,leftFex:12,rightFex: 8,leftButtonText: "切换用户", onLeftPressed: () {}, rightButtonText: '登录', onRightPressed: () {})),
+          footer: FooterButtonGroup( rightButtonText: '登录', onRightPressed: () {})),
     );
   }
 }

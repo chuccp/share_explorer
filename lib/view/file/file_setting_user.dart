@@ -14,7 +14,7 @@ class UserList extends StatefulWidget {
 }
 
 class _UserListState extends State<UserList> {
-  DataTableController dataTableController = DataTableController(columnNames: ["ID", "用户", "角色", "创建时间"]);
+  DataTableController dataTableController = DataTableController(columnNames: ["ID", "用户","证书", "角色", "创建时间"]);
 
   late int pageNo;
   List<ExUser>? list;
@@ -25,7 +25,9 @@ class _UserListState extends State<UserList> {
       list = value.data!.list;
       var total = value.data!.total;
       var dataList = <List<dynamic>>[
-        for (var ele in list!) <dynamic>[ele.id, ele.username, ele.role, ele.createTime]
+        for (var ele in list!) <dynamic>[ele.id, ele.username, TextButton(onPressed: (){
+          UserOperate.downloadUserCert(username: ele.username!);
+        }, child: const Text("下载")),ele.role, ele.createTime]
       ];
       dataTableController.updateTable(dataList, total!, 1);
     });

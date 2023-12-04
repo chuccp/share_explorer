@@ -37,6 +37,14 @@ GoRouter getRoute() {
                         return ClientSettingPage(infoItem: info);
                       }),
                   GoRoute(
+                      path: 'certUploadPage',
+                      builder: (context, state) {
+                        final Map<String, dynamic> params = state.extra! as Map<String, dynamic>;
+                        final InfoItem info = params['info']!;
+                        final List<String> addresses = params['addresses']!;
+                        return CertUploadPage(infoItem: info, addresses: addresses,);
+                      }),
+                  GoRoute(
                       path: 'clientLogin',
                       builder: (context, state) {
                         final Map<String, InfoItem> params = state.extra! as Map<String, InfoItem>;

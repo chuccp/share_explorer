@@ -117,7 +117,6 @@ class NetSetPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(signUpInfo);
     AddressControllers addressControllers = AddressControllers(addresses: infoItem.addresses!);
     return ExCardLayout(
       child: ExCard(
@@ -132,7 +131,7 @@ class NetSetPage extends StatelessWidget {
                     });
               }),
           footer: FooterButtonGroup(
-              rightButtonText: '下一步',
+              rightButtonText: '设置',
               onRightPressed: () {
                 UserOperate.addAdminUser(
                         username: signUpInfo.username!,

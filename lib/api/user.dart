@@ -174,4 +174,10 @@ class UserOperate {
     var url = "${HttpClient.getBaseUrl()}user/downloadCert?Token=$token";
     downloadUrl(url);
   }
+
+  static Future<void> downloadUserCert({required String username}) async {
+    String? token = await LocalStore.getToken();
+    var url = "${HttpClient.getBaseUrl()}user/downloadUserCert?username=$username&Token=$token";
+    downloadUrl(url);
+  }
 }

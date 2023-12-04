@@ -35,8 +35,6 @@ class DataTableController extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
   Page get page => _page;
 }
 
@@ -154,10 +152,10 @@ class _OperateView extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                 child: ElevatedButton.icon(
-                  style:  ButtonStyle(backgroundColor:MaterialStateProperty.all(Colors.pinkAccent)),
+                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.pinkAccent)),
                   icon: const Icon(Icons.delete),
                   label: const Text("删除 "),
-                  onPressed:deleteCallback ,
+                  onPressed: deleteCallback,
                 ),
               ),
           ],
@@ -233,7 +231,10 @@ class _TableViewState extends State<_TableView> {
                       page.length(),
                       (int index) {
                         List<dynamic> elementList = page.elementAt(index);
-                        var dataCells = [for (var v in elementList) DataCell(Text('$v'))];
+                        var dataCells = [
+                          for (var v in elementList)
+                            if (v is Widget) DataCell(v) else DataCell(Text('$v'))
+                        ];
                         return DataRow(
                           cells: dataCells,
                           selected: index == _selectIndex,
