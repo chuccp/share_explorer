@@ -42,7 +42,10 @@ GoRouter getRoute() {
                         final Map<String, dynamic> params = state.extra! as Map<String, dynamic>;
                         final InfoItem info = params['info']!;
                         final List<String> addresses = params['addresses']!;
-                        return CertUploadPage(infoItem: info, addresses: addresses,);
+                        return CertUploadPage(
+                          infoItem: info,
+                          addresses: addresses,
+                        );
                       }),
                   GoRoute(
                       path: 'clientLogin',
@@ -64,7 +67,14 @@ GoRouter getRoute() {
                         final Map<String, dynamic> params = state.extra! as Map<String, dynamic>;
                         final InfoItem info = params['info']!;
                         final ServerSettingItem signUpInfo = params['signUpInfo']!;
-                        return NetSetPage(infoItem: info,signUpInfo:signUpInfo);
+                        return NetSetPage(infoItem: info, signUpInfo: signUpInfo);
+                      }),
+                  GoRoute(
+                      path: 'findServerPage',
+                      builder: (context, state) {
+                        final Map<String, dynamic> params = state.extra! as Map<String, dynamic>;
+                        final InfoItem info = params['info']!;
+                        return FindServerPage(infoItem: info);
                       }),
                   GoRoute(
                       path: 'certPage',

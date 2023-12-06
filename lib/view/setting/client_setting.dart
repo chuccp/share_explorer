@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_explorer/component/ex_load.dart';
 import '../../api/user.dart';
 import '../../component/ex_address_input.dart';
 import '../../component/ex_card.dart';
@@ -33,7 +34,7 @@ class ClientSettingPage extends StatelessWidget {
           footer: FooterButtonGroup(
             rightButtonText: '下一步',
             onRightPressed: () {
-              GoRouter.of(context).replace("/certUploadPage", extra: {"info": infoItem,"addresses":addressControllers.addressStr});
+              GoRouter.of(context).push("/certUploadPage", extra: {"info": infoItem, "addresses": addressControllers.addressStr});
             },
             leftButtonText: '上一步',
             onLeftPressed: () {
@@ -53,33 +54,52 @@ class CertUploadPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FilePickerResult? filePickerResult;
     return ExCardLayout(
         child: ExCard(
       title: "证书上传",
       width: 400,
       height: 360,
       footer: FooterButtonGroup(
-        rightButtonText: '设置',
+        rightButtonText: '上传',
         onRightPressed: () {
-          UserOperate.addClient(addresses: addresses).then((value) {
-            if (value.isOK()) {
-              GoRouter.of(context).replace("/clientLogin", extra: {"info": infoItem});
-            }
-          });
+          if (filePickerResult != null) {
+            UserOperate.uploadUserCert(pickerResult: filePickerResult, progressCallback: (int count, int total) {}, addresses: addresses).then((value) {
+              if (value) {
+                GoRouter.of(context).push("/findServerPage", extra: {"info": infoItem});
+              }
+            });
+          }
         },
         leftButtonText: '上一步',
         onLeftPressed: () {
           GoRouter.of(context).pop();
         },
       ),
-      body: Column(
-        children: [
-          ExFileSelect(
-            labelText: '证书文件',
-            filePickerCallback: (FilePickerResult? value) {},
-          )
-        ],
+      body: SizedBox(
+        width: 360,
+        child: Column(
+          children: [
+            ExFileSelect(
+              labelText: '证书文件',
+              filePickerCallback: (FilePickerResult? value) {
+                filePickerResult = value;
+              },
+            )
+          ],
+        ),
       ),
     ));
+  }
+}
+
+class FindServerPage extends StatelessWidget {
+  const FindServerPage({super.key, required this.infoItem});
+
+  final InfoItem infoItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExLoading();
   }
 }

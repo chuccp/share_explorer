@@ -1,7 +1,8 @@
 import 'dart:convert';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
-
+import 'package:dio/dio.dart' as dio;
 import '../component/ex_dialog.dart';
 import '../entry/info.dart';
 import '../entry/page.dart';
@@ -115,6 +116,19 @@ class UserOperate {
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
+  }
+
+  static Future<bool> uploadUserCert({required List<String> addresses, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
+    PlatformFile? platformFile = pickerResult?.files.first;
+    if (platformFile != null) {
+      final formData = dio.FormData.fromMap({'addresses': addresses.join(";"), 'cert': dio.MultipartFile.fromStream(() => platformFile.readStream!, platformFile.size, filename: platformFile.name)});
+      var url = "${HttpClient.getBaseUrl()}user/uploadUserCert";
+      var response = await HttpClient.postFile(url, data: formData, onSendProgress: progressCallback);
+      if (response.statusCode == 200) {
+        return Future.value(true);
+      }
+    }
+    return Future.value(false);
   }
 
   static Future<Response> addUser({required String username, required String password, required String pathIds}) async {
