@@ -1,7 +1,10 @@
+import 'dart:html';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_explorer/component/ex_load.dart';
+import '../../api/discover.dart';
 import '../../api/user.dart';
 import '../../component/ex_address_input.dart';
 import '../../component/ex_card.dart';
@@ -93,13 +96,63 @@ class CertUploadPage extends StatelessWidget {
   }
 }
 
-class FindServerPage extends StatelessWidget {
+class FindServerPage extends StatefulWidget {
   const FindServerPage({super.key, required this.infoItem});
 
   final InfoItem infoItem;
 
   @override
+  State<StatefulWidget> createState() => _FindServerPageState();
+}
+
+class _FindServerPageState extends State<FindServerPage> {
+  Future<dynamic>? future;
+
+  bool hasDispose = false;
+
+  query(BuildContext context) {
+    future = Future.delayed(const Duration(seconds: 2)).then((value) => {
+          if (!hasDispose)
+            {
+              DiscoverOperate.nodeStatus().then((value) => {
+                    if (value)
+                      {
+                        GoRouter.of(context).replace("/clientLogin", extra: {"info": widget.infoItem})
+                      }
+                    else
+                      {
+                        if (!hasDispose) {query(context)}
+                      }
+                  })
+            }
+        });
+  }
+
+  @override
+  void dispose() {
+    hasDispose = true;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ExLoading();
+    hasDispose = false;
+    query(context);
+    return ExCardLayout(
+        child: ExCard(
+      width: 400,
+      height: 220,
+      title: "查找节点",
+      body: SizedBox(
+        width: 200,
+        child: Column(
+          children: [
+            ExLoading(
+              title: "查找服务节点中....",
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }

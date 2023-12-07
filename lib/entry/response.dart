@@ -22,6 +22,8 @@ class Response<T> {
     return Response(code: Json.getInt(json, "code"), data: Json.getDynamic(json, "data"),error:Json.getString(json, "error") );
   }
 
+  
+
   static Response<String> ok() {
     return Response<String>(code: 200, data: "ok");
   }

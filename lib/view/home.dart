@@ -39,7 +39,11 @@ class LoadPage extends StatelessWidget {
           if (value.isServer!) {
             GoRouter.of(context).replace("/serverLogin", extra: {"info": value});
           } else {
-            GoRouter.of(context).replace("/clientLogin", extra: {"info": value});
+            if (value.hasServer!) {
+              GoRouter.of(context).replace("/clientLogin", extra: {"info": value});
+            } else {
+              GoRouter.of(context).replace("/findServerPage", extra: {"info": value});
+            }
           }
         }
       } else {

@@ -111,7 +111,7 @@ class ExCard extends StatelessWidget {
     list.add(Expanded(
       child: body,
     ));
-    footer ??= FooterButtonGroup(rightButtonText: '下一步');
+    // footer ??= FooterButtonGroup(rightButtonText: '下一步');
     if (footer != null) {
       list.add(Container(
         height: 50,
