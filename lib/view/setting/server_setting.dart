@@ -109,22 +109,33 @@ class _SetSignUpState extends State<SetSignUp> {
   }
 }
 
-class NetSetPage extends StatelessWidget {
+class NetSetPage extends StatefulWidget {
   const NetSetPage({super.key, required this.infoItem, required this.signUpInfo});
 
   final InfoItem infoItem;
   final ServerSettingItem signUpInfo;
 
   @override
+  State<StatefulWidget> createState() => _NetSetPageState();
+}
+
+class _NetSetPageState extends State<NetSetPage> {
+  AddressControllers? addressControllers;
+
+  @override
+  void initState() {
+    addressControllers = AddressControllers(addresses: widget.infoItem.addresses!);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    AddressControllers addressControllers = AddressControllers(addresses: infoItem.addresses!);
     return ExCardLayout(
       child: ExCard(
           width: 400,
           height: 360,
           title: "远程节点设置",
           body: AddressInputGroup(
-              addressControllers: addressControllers,
+              addressControllers: addressControllers!,
               testCallback: (value) {
                 UserOperate.connect(address: value.toString()).then((value) => {
                       if (value.isOK()) {alertDialog(context: context, msg: value.data)}
@@ -134,16 +145,16 @@ class NetSetPage extends StatelessWidget {
               rightButtonText: '设置',
               onRightPressed: () {
                 UserOperate.addAdminUser(
-                        username: signUpInfo.username!,
-                        password: signUpInfo.password!,
-                        rePassword: signUpInfo.rePassword!,
-                        isNatClient: signUpInfo.useNatSelected!,
-                        isNatServer: signUpInfo.beNatSelected!,
-                        addresses: addressControllers.addressStr)
+                        username: widget.signUpInfo.username!,
+                        password: widget.signUpInfo.password!,
+                        rePassword: widget.signUpInfo.rePassword!,
+                        isNatClient: widget.signUpInfo.useNatSelected!,
+                        isNatServer: widget.signUpInfo.beNatSelected!,
+                        addresses: addressControllers!.addressStr)
                     .then((value) {
                   if (value.isOK()) {
-                    LocalStore.saveToken(token: value.data,expires: const Duration(days: 1)).then((value){
-                      GoRouter.of(context).push("/certPage", extra: {"info": infoItem});
+                    LocalStore.saveToken(token: value.data, expires: const Duration(days: 1)).then((value) {
+                      GoRouter.of(context).push("/certPage", extra: {"info": widget.infoItem});
                     });
                   }
                 });

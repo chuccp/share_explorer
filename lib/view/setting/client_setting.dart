@@ -14,21 +14,32 @@ import '../../entry/address.dart';
 import '../../entry/info.dart';
 import 'package:file_picker/file_picker.dart';
 
-class ClientSettingPage extends StatelessWidget {
+class ClientSettingPage extends StatefulWidget {
   const ClientSettingPage({super.key, required this.infoItem});
 
   final InfoItem infoItem;
 
   @override
+  State<StatefulWidget> createState() => _ClientSettingPageState();
+}
+
+class _ClientSettingPageState extends State<ClientSettingPage> {
+  AddressControllers? addressControllers;
+
+  @override
+  void initState() {
+    addressControllers = AddressControllers(addresses: widget.infoItem.addresses!);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    AddressControllers addressControllers = AddressControllers(addresses: infoItem.addresses!);
     return ExCardLayout(
       child: ExCard(
           width: 400,
           height: 360,
           title: "远程节点设置",
           body: AddressInputGroup(
-              addressControllers: addressControllers,
+              addressControllers: addressControllers!,
               testCallback: (value) {
                 UserOperate.connect(address: value.toString()).then((value) => {
                       if (value.isOK()) {alertDialog(context: context, msg: value.data)}
@@ -37,7 +48,7 @@ class ClientSettingPage extends StatelessWidget {
           footer: FooterButtonGroup(
             rightButtonText: '下一步',
             onRightPressed: () {
-              GoRouter.of(context).push("/certUploadPage", extra: {"info": infoItem, "addresses": addressControllers.addressStr});
+              GoRouter.of(context).push("/certUploadPage", extra: {"info": widget.infoItem, "addresses": addressControllers!.addressStr});
             },
             leftButtonText: '上一步',
             onLeftPressed: () {
