@@ -152,6 +152,7 @@ void _uploadFile(BuildContext context, String rootPath, FilePickerResult? picker
       pickerResult: pickerResult,
       rootPath: rootPath,
       progressCallback: (int count, int total) {
+        print("count:$count ======== total:$total");
         var progress = Progress(id: id.toString(), name: name, count: count, total: total);
         Provider.of<FilePageDelegate>(context, listen: false).updateProgresses(progress);
       }).then((value) => {
@@ -417,11 +418,7 @@ class _FileListViewState extends State<_FileListView> {
                 loadFileAsset(context: context, rootPath: widget.rootPath, path: items[i].path!, isArrow: false);
               } else {
                 Future.delayed(const Duration(milliseconds: 100)).then((value) {
-                  // FilePicker.platform.saveFile(fileName: items[i].name).then((value) {
-                  //   if (value != null && value.isNotEmpty) {
-                  //     FileOperate.downLoadFile(fileItem: items[i], localPath: value);
-                  //   }
-                  // });
+                        FileOperate.download(rootPath: widget.rootPath, path_: items[i].path!);
                 });
                 Provider.of<FilePageDelegate>(context, listen: false).unFocusNodes();
               }

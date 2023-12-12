@@ -34,6 +34,12 @@ class HttpClient {
   }
 
   static Future<Response<dynamic>> postFile(String url, {required dio.FormData data, required dio.ProgressCallback onSendProgress}) async {
-    return await httpClient.post(url,data: data,onSendProgress:onSendProgress);
+    return await httpClient.post(url,data: data,onSendProgress:(num,count){
+      print("onSendProgress num:$num  count:$count");
+    },onReceiveProgress:(num,count){
+
+      print("onReceiveProgress num:$num  count:$count");
+
+    });
   }
 }

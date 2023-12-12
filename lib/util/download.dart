@@ -2,7 +2,7 @@
 import 'dart:html';
 Future<void> downloadUrl(String url) async {
   final anchor = AnchorElement(href: url)
-    ..target = '_self';
+    ..target = '_download';
   document.body?.append(anchor);
   anchor.click();
   anchor.remove();
