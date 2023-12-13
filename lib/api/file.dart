@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:async/async.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart' as dio;
@@ -5,6 +8,7 @@ import '../entry/file.dart';
 import '../util/download.dart';
 import '../util/http_client.dart';
 import '../util/local_store.dart';
+import '../util/stream.dart';
 
 class FileOperate {
   static Future<List<FileItem>> rootListSync() async {
@@ -37,21 +41,45 @@ class FileOperate {
     downloadUrl(url);
   }
 
-  static Future<bool> uploadNewFile({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
+  // static Future<bool> uploadNewFile({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
+  //   PlatformFile? platformFile = pickerResult?.files.first;
+  //   if (platformFile != null) {
+  //     final formData = dio.FormData.fromMap({
+  //       'Path': path,
+  //       "RootPath": rootPath,
+  //       'file': dio.MultipartFile.fromStream(() {
+  //         return limitStream(platformFile.readStream!,progressCallback: progressCallback,total: platformFile.size);
+  //       }, platformFile.size, filename: platformFile.name)
+  //     });
+  //     var url = "${HttpClient.getBaseUrl()}file/upload?Path=$path&RootPath=$rootPath";
+  //     var response = await HttpClient.postFile(url, data: formData, onSendProgress: progressCallback);
+  //     if (response.statusCode == 200) {
+  //       return Future.value(true);
+  //     }
+  //   }
+  //   return Future.value(false);
+  // }
+
+  static Future<bool> uploadNewFile2({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
     PlatformFile? platformFile = pickerResult?.files.first;
     if (platformFile != null) {
-      final formData = dio.FormData.fromMap({
-        'Path': path,
-        "RootPath": rootPath,
-        'file': dio.MultipartFile.fromStream(() {
-          return platformFile.readStream!;
-        }, platformFile.size, filename: platformFile.name)
-      });
-      var url = "${HttpClient.getBaseUrl()}file/upload";
-      var response = await HttpClient.postFile(url, data: formData, onSendProgress: progressCallback);
-      if (response.statusCode == 200) {
-        return Future.value(true);
+      var url = "${HttpClient.getBaseUrl()}file/upload2";
+
+      var sizeList = splitNumber(platformFile.size, 10);
+
+      var chunkedStreamReader = ChunkedStreamReader(platformFile.readStream!);
+
+      for (var index = 0; index < sizeList.length; index++) {
+        var size = sizeList.elementAt(index);
+        var stream = chunkedStreamReader.readStream(size);
+        var response = await HttpClient.postFile(url,
+            data: stream, queryParameters: {"seq": index, "size": size, "total": platformFile.size, "count": sizeList.length, "path": path, "rootPath": rootPath, "name": platformFile.name});
+        if (response.statusCode != 200) {
+          return Future.value(false);
+        }
       }
+
+      return Future.value(true);
     }
     return Future.value(false);
   }

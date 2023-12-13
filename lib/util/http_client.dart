@@ -7,10 +7,8 @@ import 'local_store.dart';
 class HttpClient {
   static final httpClient = dio.Dio();
 
-
-
-  static  Future<Response<dynamic>> get(String url,{Map<String, dynamic>? queryParameters}) async {
-    return await httpClient.get(url,queryParameters:queryParameters, options: await getOptions());
+  static Future<Response<dynamic>> get(String url, {Map<String, dynamic>? queryParameters}) async {
+    return await httpClient.get(url, queryParameters: queryParameters, options: await getOptions());
   }
 
   static Future<Response<dynamic>> postJson(String url, Object? body) async {
@@ -33,13 +31,7 @@ class HttpClient {
     return "http://127.0.0.1:2156/";
   }
 
-  static Future<Response<dynamic>> postFile(String url, {required dio.FormData data, required dio.ProgressCallback onSendProgress}) async {
-    return await httpClient.post(url,data: data,onSendProgress:(num,count){
-      print("onSendProgress num:$num  count:$count");
-    },onReceiveProgress:(num,count){
-
-      print("onReceiveProgress num:$num  count:$count");
-
-    });
+  static Future<Response<dynamic>> postFile(String url, {Map<String, dynamic>? queryParameters, required Object? data,  dio.ProgressCallback? onSendProgress}) async {
+    return await httpClient.post(url, data: data,options:Options(headers: {"Content-Type":"multipart/form-data"}), queryParameters: queryParameters, onSendProgress: onSendProgress);
   }
 }

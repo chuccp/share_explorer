@@ -50,9 +50,12 @@ class FilePageDelegate extends ChangeNotifier {
   UnmodifiableListView<Progress> get progresses => UnmodifiableListView(_progresses.values);
 
   void updateProgresses(Progress progress) {
+    print(progress.id);
     if (_progresses.containsKey(progress.id)) {
+      print("===========");
       _progresses[progress.id]!.count = progress.count;
     } else {
+      print("===1111========");
       _progresses[progress.id!] = progress;
     }
     notifyListeners();
@@ -147,7 +150,7 @@ void _uploadFile(BuildContext context, String rootPath, FilePickerResult? picker
   var path = Provider.of<FilePageDelegate>(context, listen: false).path;
   var id = DateTime.timestamp().millisecond;
   String? name = pickerResult?.names.first;
-  FileOperate.uploadNewFile(
+  FileOperate.uploadNewFile2(
       path: path,
       pickerResult: pickerResult,
       rootPath: rootPath,
@@ -266,7 +269,7 @@ class _FileOperate extends StatelessWidget {
                       },
                     );
                   },
-                  menuChildren: const [_TransformView()],
+                  menuChildren:  [_TransformView(topContext: context,)],
                 ),
               ))
         ],
@@ -276,10 +279,14 @@ class _FileOperate extends StatelessWidget {
 }
 
 class _TransformView extends StatelessWidget {
-  const _TransformView({super.key});
+  const _TransformView({super.key, required this.topContext});
+
+ final BuildContext topContext;
 
   @override
   Widget build(BuildContext context) {
+    var progresses = Provider.of<FilePageDelegate>(topContext).progresses;
+    print(progresses.length);
     return SizedBox(
       width: 500,
       height: 400,
@@ -288,7 +295,7 @@ class _TransformView extends StatelessWidget {
           SizedBox(
             width: 120,
             child: ExButtonGroup(
-              titles: const ["文件上传(0)"],
+              titles:  ["文件上传(${progresses.length})"],
               emptyTitle: '',
             ),
           ),
@@ -417,8 +424,7 @@ class _FileListViewState extends State<_FileListView> {
               if (items[i].isDir!) {
                 loadFileAsset(context: context, rootPath: widget.rootPath, path: items[i].path!, isArrow: false);
               } else {
-                Future.delayed(const Duration(milliseconds: 100)).then((value) {
-                        FileOperate.download(rootPath: widget.rootPath, path_: items[i].path!);
+                Future.delayed(const Duration(milliseconds: 100)).then((value) {FileOperate.download(rootPath: widget.rootPath, path_: items[i].path!);
                 });
                 Provider.of<FilePageDelegate>(context, listen: false).unFocusNodes();
               }
