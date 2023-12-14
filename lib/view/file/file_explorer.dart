@@ -8,6 +8,7 @@ import '../../api/file.dart';
 import '../../component/ex_button_group.dart';
 import '../../component/ex_file_process.dart';
 import '../../component/ex_load.dart';
+import '../../component/ex_transformView.dart';
 import '../../component/file_icon_button.dart';
 import '../../entry/file.dart';
 import '../../entry/path.dart';
@@ -23,7 +24,7 @@ class FilePageDelegate extends ChangeNotifier {
 
   UnmodifiableListView<PathItem> get items => UnmodifiableListView(_pathItem);
 
-  PathItem get lastItem =>   _pathItem[_pathItem.length - 1];
+  PathItem get lastItem => _pathItem[_pathItem.length - 1];
 
   PathItem _backItems() {
     var i = index - 1;
@@ -146,21 +147,18 @@ class FileExplorer extends StatelessWidget {
   }
 }
 
-void _uploadFile(BuildContext context, String rootPath, FilePickerResult? pickerResult) {
+void _uploadFile(BuildContext context, String rootPath, FilePickerResult? pickerResult, ExTransformController exTransformController) {
   var path = Provider.of<FilePageDelegate>(context, listen: false).path;
   var id = DateTime.timestamp().millisecond;
   String? name = pickerResult?.names.first;
-  FileOperate.uploadNewFile2(
-      path: path,
-      pickerResult: pickerResult,
-      rootPath: rootPath,
-      progressCallback: (int count, int total) {
-        print("count:$count ======== total:$total");
-        var progress = Progress(id: id.toString(), name: name, count: count, total: total);
-        Provider.of<FilePageDelegate>(context, listen: false).updateProgresses(progress);
-      }).then((value) => {
-        if (value) {loadFileAsset(context: context, rootPath: rootPath, path: path, isArrow: false)}
-      });
+  var progress = Progress(pickerResult!, id: "$id", name: name,total: pickerResult.files.first.size);
+
+  progress.exec(path, rootPath).then((value) {
+    if (value) {
+      loadFileAsset(context: context, rootPath: rootPath, path: path, isArrow: false);
+    }
+  });
+  exTransformController.addOrUpdate(progress);
 }
 
 void createFolder({required BuildContext context, required String rootPath, required String folder}) {
@@ -175,6 +173,7 @@ class _FileOperate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ExTransformController exTransformController = ExTransformController();
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Row(
@@ -190,7 +189,7 @@ class _FileOperate extends StatelessWidget {
                   Future<FilePickerResult?> result = FilePicker.platform.pickFiles(withReadStream: true);
                   result.then((value) {
                     if (value != null) {
-                      _uploadFile(context, rootPath, value);
+                      _uploadFile(context, rootPath, value, exTransformController);
                     }
                   });
                 },
@@ -269,42 +268,13 @@ class _FileOperate extends StatelessWidget {
                       },
                     );
                   },
-                  menuChildren:  [_TransformView(topContext: context,)],
+                  menuChildren: [
+                    ExTransformView(
+                      exTransformController: exTransformController,
+                    )
+                  ],
                 ),
               ))
-        ],
-      ),
-    );
-  }
-}
-
-class _TransformView extends StatelessWidget {
-  const _TransformView({super.key, required this.topContext});
-
- final BuildContext topContext;
-
-  @override
-  Widget build(BuildContext context) {
-    var progresses = Provider.of<FilePageDelegate>(topContext).progresses;
-    print(progresses.length);
-    return SizedBox(
-      width: 500,
-      height: 400,
-      child: Row(
-        children: [
-          SizedBox(
-            width: 120,
-            child: ExButtonGroup(
-              titles:  ["文件上传(${progresses.length})"],
-              emptyTitle: '',
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-            height: 400,
-            child: const VerticalDivider(width: 3, color: Colors.black26, indent: 1),
-          ),
-          const ExFileProcessList()
         ],
       ),
     );
@@ -354,9 +324,7 @@ class _PathView extends StatelessWidget {
       ExPathButton(
         hasPress: items.isNotEmpty,
         onPressed: () {
-
           loadFileAsset(context: context, rootPath: exPath.path!, path: "/", isArrow: false);
-
         },
         title: exPath.name!,
       ),
@@ -424,7 +392,8 @@ class _FileListViewState extends State<_FileListView> {
               if (items[i].isDir!) {
                 loadFileAsset(context: context, rootPath: widget.rootPath, path: items[i].path!, isArrow: false);
               } else {
-                Future.delayed(const Duration(milliseconds: 100)).then((value) {FileOperate.download(rootPath: widget.rootPath, path_: items[i].path!);
+                Future.delayed(const Duration(milliseconds: 100)).then((value) {
+                  FileOperate.download(rootPath: widget.rootPath, path_: items[i].path!);
                 });
                 Provider.of<FilePageDelegate>(context, listen: false).unFocusNodes();
               }

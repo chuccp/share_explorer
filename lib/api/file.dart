@@ -41,44 +41,26 @@ class FileOperate {
     downloadUrl(url);
   }
 
-  // static Future<bool> uploadNewFile({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
-  //   PlatformFile? platformFile = pickerResult?.files.first;
-  //   if (platformFile != null) {
-  //     final formData = dio.FormData.fromMap({
-  //       'Path': path,
-  //       "RootPath": rootPath,
-  //       'file': dio.MultipartFile.fromStream(() {
-  //         return limitStream(platformFile.readStream!,progressCallback: progressCallback,total: platformFile.size);
-  //       }, platformFile.size, filename: platformFile.name)
-  //     });
-  //     var url = "${HttpClient.getBaseUrl()}file/upload?Path=$path&RootPath=$rootPath";
-  //     var response = await HttpClient.postFile(url, data: formData, onSendProgress: progressCallback);
-  //     if (response.statusCode == 200) {
-  //       return Future.value(true);
-  //     }
-  //   }
-  //   return Future.value(false);
-  // }
-
   static Future<bool> uploadNewFile2({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
     PlatformFile? platformFile = pickerResult?.files.first;
     if (platformFile != null) {
       var url = "${HttpClient.getBaseUrl()}file/upload2";
-
-      var sizeList = splitNumber(platformFile.size, 10);
-
+      var sizeList = splitNumber(platformFile.size, 100);
       var chunkedStreamReader = ChunkedStreamReader(platformFile.readStream!);
-
+      int uploadNum = 0;
       for (var index = 0; index < sizeList.length; index++) {
+        progressCallback(uploadNum, platformFile.size);
         var size = sizeList.elementAt(index);
         var stream = chunkedStreamReader.readStream(size);
         var response = await HttpClient.postFile(url,
-            data: stream, queryParameters: {"seq": index, "size": size, "total": platformFile.size, "count": sizeList.length, "path": path, "rootPath": rootPath, "name": platformFile.name});
+            data: limitStream(stream),
+            queryParameters: {"seq": index, "size": size, "total": platformFile.size, "count": sizeList.length, "path": path, "rootPath": rootPath, "name": platformFile.name});
         if (response.statusCode != 200) {
           return Future.value(false);
         }
+        uploadNum = uploadNum + size;
       }
-
+      progressCallback(uploadNum, platformFile.size);
       return Future.value(true);
     }
     return Future.value(false);
