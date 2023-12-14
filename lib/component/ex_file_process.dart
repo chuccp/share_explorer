@@ -60,8 +60,16 @@ class ExFileProcess extends StatelessWidget {
             children: [
               IconButton(
                 splashRadius: 15,
-                icon:  progress.isDone!?const Icon(Icons.check):const Icon(Icons.play_arrow),
-                onPressed: () {},
+                icon:  progress.isDone!?const Icon(Icons.check):(progress.isStop?const Icon(Icons.play_arrow):const Icon(Icons.pause )),
+                onPressed: () {
+                  if(!progress.isDone!){
+                    if(progress.isStop){
+                      progress.resume();
+                    }else{
+                      progress.pause();
+                    }
+                  }
+                },
               ),
               IconButton(
                 splashRadius: 15,

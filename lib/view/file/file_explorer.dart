@@ -152,13 +152,13 @@ void _uploadFile(BuildContext context, String rootPath, FilePickerResult? picker
   var id = DateTime.timestamp().millisecond;
   String? name = pickerResult?.names.first;
   var progress = Progress(pickerResult!, id: "$id", name: name,total: pickerResult.files.first.size);
-
+  exTransformController.add(progress);
   progress.exec(path, rootPath).then((value) {
     if (value) {
       loadFileAsset(context: context, rootPath: rootPath, path: path, isArrow: false);
     }
   });
-  exTransformController.addOrUpdate(progress);
+
 }
 
 void createFolder({required BuildContext context, required String rootPath, required String folder}) {

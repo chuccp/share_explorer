@@ -26,7 +26,7 @@ Stream<List<int>> limitStream(Stream<List<int>> stream) {
   int total = 0;
   int totalNum = 0;
   bool end = false;
-  Timer.periodic(const Duration(seconds: 1), (timer) {
+  Timer.periodic(const Duration(milliseconds: 50), (timer) {
     if (list2.length <= max) {
       stream0.add(list2);
       totalNum = totalNum + list2.length;

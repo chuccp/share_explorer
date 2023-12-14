@@ -1,8 +1,11 @@
+import 'package:async/async.dart';
+import 'package:dio/dio.dart' as dio;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/widgets.dart';
 
 import '../api/file.dart';
-
+import '../util/http_client.dart';
+import '../util/stream.dart';
 class Progress {
   Progress(
     this.pickerResult, {
@@ -31,6 +34,26 @@ class Progress {
     return convertBytes(total!);
   }
 
+  bool isStop = false;
+
+  bool isDownload = true;
+
+ Future<bool> pause(){
+   if(isDownload){
+     isDownload = false;
+   }
+    return Future.value(true);
+ }
+
+  Future<bool> resume(){
+   if(isStop){
+     isStop = false;
+     isDownload = true;
+     start();
+   }
+    return Future.value(true);
+  }
+
   String __speed() {
     return convertBytes(_speed);
   }
@@ -57,7 +80,7 @@ class Progress {
   Future<bool> exec(String path, String rootPath) {
     count = 0;
     startTime = DateTime.now().millisecondsSinceEpoch;
-    return FileOperate.uploadNewFile2(
+    return uploadNewFile2(
         path: path,
         pickerResult: pickerResult,
         rootPath: rootPath,
@@ -65,13 +88,11 @@ class Progress {
           var endTime = DateTime.now().millisecondsSinceEpoch;
           startTime ??= DateTime.now().millisecondsSinceEpoch;
           this.count??=0;
-          print("${this.count}=======$count=======$endTime======$startTime");
           if(endTime == startTime){
             _speed = 0;
           }else{
             _speed = ((count - this.count!)*1000/ (endTime - startTime!)).floor();
           }
-
           startTime = endTime;
           this.count = count;
           this.total = total;
@@ -83,4 +104,57 @@ class Progress {
           }
         });
   }
+
+  List<int>?  sizeList;
+  String? url;
+  ChunkedStreamReader<int>? chunkedStreamReader;
+  int uploadNum = 0;
+  dio.ProgressCallback? progressCallback;
+  String? path;
+  String? rootPath;
+
+  int startIndex = 0;
+
+
+   Future<bool> uploadNewFile2({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
+    PlatformFile? platformFile = pickerResult?.files.first;
+    if (platformFile != null) {
+      url = "${HttpClient.getBaseUrl()}file/upload2";
+      sizeList = splitNumber(platformFile.size, 100);
+      chunkedStreamReader = ChunkedStreamReader(platformFile.readStream!);
+      this.progressCallback = progressCallback;
+      total = platformFile.size;
+      this.path = path;
+      this.rootPath = rootPath;
+      name = platformFile.name;
+      progressCallback(uploadNum, total!);
+      return  start();
+    }
+    return Future.value(false);
+  }
+
+  Future<bool>  start() async {
+    for (var index = startIndex; index < sizeList!.length; index++) {
+      var size = sizeList!.elementAt(index);
+      var stream = chunkedStreamReader!.readStream(size);
+      var response = await HttpClient.postFile(url!,
+          data: limitStream(stream),
+          queryParameters: {"seq": index, "size": size, "total": total, "count": sizeList!.length, "path": path, "rootPath": rootPath, "name": name});
+      if (response.statusCode != 200) {
+        return Future.value(false);
+      }
+      uploadNum = uploadNum + size;
+      progressCallback!(uploadNum, total!);
+
+      if(!isDownload){
+        startIndex = index+1;
+        isStop = true;
+        return Future.value(true);
+      }
+
+    }
+    return Future.value(true);
+  }
+
+
 }

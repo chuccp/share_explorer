@@ -7,22 +7,13 @@ import 'ex_file_process.dart';
 class ExTransformController extends ValueNotifier<List<Progress>> {
   ExTransformController() : super(List.empty(growable: true));
 
-  addOrUpdate(Progress progress) {
-    for (var element in value) {
-      if (element.id == progress.id) {
-        element.count = progress.count;
-        if (element.count == element.total) {
-          element.isDone = true;
-        }
-        notifyListeners();
-        return;
-      }
-    }
+  add(Progress progress) {
     progress.isDone = false;
     progress.voidCallback = (){
       notifyListeners();
     };
     value.add(progress);
+
     notifyListeners();
   }
 }
@@ -44,8 +35,8 @@ class _ExTransformViewState extends State<ExTransformView> {
     return ValueListenableBuilder(
       valueListenable: widget.exTransformController,
       builder: (BuildContext context, value, Widget? child) {
-        var noFinish = widget.exTransformController.value.takeWhile((value) => value.isDone == null || value.isDone == false);
-        var finish = widget.exTransformController.value.takeWhile((value) => value.isDone != null && value.isDone == true);
+        var noFinish = widget.exTransformController.value.where((element) => element.isDone!=true);
+        var finish = widget.exTransformController.value.where((value) =>  value.isDone == true);
         return SizedBox(
           width: 500,
           height: 400,
