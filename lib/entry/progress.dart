@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import '../api/file.dart';
 import '../util/http_client.dart';
 import '../util/stream.dart';
+
 class Progress {
   Progress(
     this.pickerResult, {
@@ -36,21 +37,33 @@ class Progress {
 
   bool isStop = false;
 
+  bool isCancel = false;
+
   bool isDownload = true;
 
- Future<bool> pause(){
-   if(isDownload){
-     isDownload = false;
-   }
+  Future<bool> pause() {
+    if (isDownload) {
+      isDownload = false;
+    }
     return Future.value(true);
- }
+  }
 
-  Future<bool> resume(){
-   if(isStop){
-     isStop = false;
-     isDownload = true;
-     start();
-   }
+  Future<bool> cancel() {
+    isDownload = false;
+    isStop = true;
+    isCancel = true;
+    if (!isCancel) {
+      return doCancel();
+    }
+    return Future.value(true);
+  }
+
+  Future<bool> resume() {
+    if (isStop) {
+      isStop = false;
+      isDownload = true;
+      start();
+    }
     return Future.value(true);
   }
 
@@ -87,16 +100,16 @@ class Progress {
         progressCallback: (int count, int total) {
           var endTime = DateTime.now().millisecondsSinceEpoch;
           startTime ??= DateTime.now().millisecondsSinceEpoch;
-          this.count??=0;
-          if(endTime == startTime){
+          this.count ??= 0;
+          if (endTime == startTime) {
             _speed = 0;
-          }else{
-            _speed = ((count - this.count!)*1000/ (endTime - startTime!)).floor();
+          } else {
+            _speed = ((count - this.count!) * 1000 / (endTime - startTime!)).floor();
           }
           startTime = endTime;
           this.count = count;
           this.total = total;
-          if(count==total){
+          if (count == total) {
             isDone = true;
           }
           if (voidCallback != null) {
@@ -105,18 +118,16 @@ class Progress {
         });
   }
 
-  List<int>?  sizeList;
+  List<int>? sizeList;
   String? url;
   ChunkedStreamReader<int>? chunkedStreamReader;
   int uploadNum = 0;
   dio.ProgressCallback? progressCallback;
   String? path;
   String? rootPath;
-
   int startIndex = 0;
 
-
-   Future<bool> uploadNewFile2({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
+  Future<bool> uploadNewFile2({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
     PlatformFile? platformFile = pickerResult?.files.first;
     if (platformFile != null) {
       url = "${HttpClient.getBaseUrl()}file/upload2";
@@ -128,33 +139,42 @@ class Progress {
       this.rootPath = rootPath;
       name = platformFile.name;
       progressCallback(uploadNum, total!);
-      return  start();
+      return start();
     }
     return Future.value(false);
   }
 
-  Future<bool>  start() async {
+  Future<bool> doCancel() {
+    if (chunkedStreamReader != null) {
+      chunkedStreamReader!.cancel();
+    }
+    return Future.value(true);
+  }
+
+  Future<bool> start() async {
+    if (isCancel) {
+      return Future.value(false);
+    }
     for (var index = startIndex; index < sizeList!.length; index++) {
+      if (isCancel) {
+        break;
+      }
       var size = sizeList!.elementAt(index);
       var stream = chunkedStreamReader!.readStream(size);
       var response = await HttpClient.postFile(url!,
-          data: limitStream(stream),
-          queryParameters: {"seq": index, "size": size, "total": total, "count": sizeList!.length, "path": path, "rootPath": rootPath, "name": name});
+          data: limitStream(stream), queryParameters: {"seq": index, "size": size, "total": total, "count": sizeList!.length, "path": path, "rootPath": rootPath, "name": name});
       if (response.statusCode != 200) {
         return Future.value(false);
       }
       uploadNum = uploadNum + size;
       progressCallback!(uploadNum, total!);
 
-      if(!isDownload){
-        startIndex = index+1;
+      if (!isDownload) {
+        startIndex = index + 1;
         isStop = true;
         return Future.value(true);
       }
-
     }
     return Future.value(true);
   }
-
-
 }

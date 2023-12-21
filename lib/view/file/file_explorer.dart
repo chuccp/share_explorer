@@ -50,18 +50,6 @@ class FilePageDelegate extends ChangeNotifier {
 
   UnmodifiableListView<Progress> get progresses => UnmodifiableListView(_progresses.values);
 
-  void updateProgresses(Progress progress) {
-    print(progress.id);
-    if (_progresses.containsKey(progress.id)) {
-      print("===========");
-      _progresses[progress.id]!.count = progress.count;
-    } else {
-      print("===1111========");
-      _progresses[progress.id!] = progress;
-    }
-    notifyListeners();
-  }
-
   int index = 0;
   final List<PathItem> _pathArrowItem = [];
 
@@ -121,6 +109,12 @@ void loadFileAsset({required BuildContext context, required String rootPath, req
       .onError((error, stackTrace) => {Provider.of<FilePageDelegate>(context, listen: false).toPath(path: path, fileItems: [], isArrow: isArrow, rootPath: rootPath)});
 }
 
+void refresh({required BuildContext context}) {
+  var rootPath = Provider.of<FilePageDelegate>(context, listen: false).rootPath;
+  var path = Provider.of<FilePageDelegate>(context, listen: false).path;
+  loadFileAsset(context: context, rootPath: rootPath, path: path, isArrow: false);
+}
+
 class FileExplorer extends StatelessWidget {
   const FileExplorer({super.key, required this.exPath});
 
@@ -151,14 +145,13 @@ void _uploadFile(BuildContext context, String rootPath, FilePickerResult? picker
   var path = Provider.of<FilePageDelegate>(context, listen: false).path;
   var id = DateTime.timestamp().millisecond;
   String? name = pickerResult?.names.first;
-  var progress = Progress(pickerResult!, id: "$id", name: name,total: pickerResult.files.first.size);
+  var progress = Progress(pickerResult!, id: "$id", name: name, total: pickerResult.files.first.size);
   exTransformController.add(progress);
   progress.exec(path, rootPath).then((value) {
     if (value) {
       loadFileAsset(context: context, rootPath: rootPath, path: path, isArrow: false);
     }
   });
-
 }
 
 void createFolder({required BuildContext context, required String rootPath, required String folder}) {
@@ -174,6 +167,9 @@ class _FileOperate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ExTransformController exTransformController = ExTransformController();
+    exTransformController.finish(() {
+      refresh(context: context);
+    });
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Row(
@@ -236,9 +232,7 @@ class _FileOperate extends StatelessWidget {
                   icon: const Icon(Icons.cached),
                   label: const Text("刷新"),
                   onPressed: () {
-                    var rootPath = Provider.of<FilePageDelegate>(context, listen: false).rootPath;
-                    var path = Provider.of<FilePageDelegate>(context, listen: false).path;
-                    loadFileAsset(context: context, rootPath: rootPath, path: path, isArrow: false);
+                    refresh(context: context);
                   },
                 ),
               )

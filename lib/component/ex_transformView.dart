@@ -9,11 +9,26 @@ class ExTransformController extends ValueNotifier<List<Progress>> {
 
   add(Progress progress) {
     progress.isDone = false;
-    progress.voidCallback = (){
+    progress.voidCallback = () {
       notifyListeners();
+      if (_voidCallback != null) {
+        if (progress.isDone!) {
+          _voidCallback!();
+        }
+      }
     };
     value.add(progress);
+    notifyListeners();
+  }
 
+  VoidCallback? _voidCallback;
+
+  finish(VoidCallback? voidCallback) {
+    _voidCallback = voidCallback;
+  }
+
+  remove(Progress progress) {
+    value.remove(progress);
     notifyListeners();
   }
 }
@@ -35,8 +50,8 @@ class _ExTransformViewState extends State<ExTransformView> {
     return ValueListenableBuilder(
       valueListenable: widget.exTransformController,
       builder: (BuildContext context, value, Widget? child) {
-        var noFinish = widget.exTransformController.value.where((element) => element.isDone!=true);
-        var finish = widget.exTransformController.value.where((value) =>  value.isDone == true);
+        var noFinish = widget.exTransformController.value.where((element) => element.isDone != true);
+        var finish = widget.exTransformController.value.where((value) => value.isDone == true);
         return SizedBox(
           width: 500,
           height: 400,
@@ -59,8 +74,10 @@ class _ExTransformViewState extends State<ExTransformView> {
                 child: const VerticalDivider(width: 3, color: Colors.black26, indent: 1),
               ),
               ExFileProcessList(
-                progresses: ( selectIndex==0 ? noFinish : finish),
-              ),
+                  progresses: (selectIndex == 0 ? noFinish : finish),
+                  onCancel: (progress) {
+                    widget.exTransformController.remove(progress);
+                  }),
             ],
           ),
         );
