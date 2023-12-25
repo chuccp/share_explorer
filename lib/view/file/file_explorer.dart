@@ -118,15 +118,10 @@ void refresh({required BuildContext context}) {
 void goUpPath({required BuildContext context}) {
   var rootPath = Provider.of<FilePageDelegate>(context, listen: false).rootPath;
   var path = Provider.of<FilePageDelegate>(context, listen: false).path;
-  print(rootPath);
-  print(path);
   var pathItems = PathItem.splitPath(path);
-  print(pathItems.length);
   if (pathItems.length > 1) {
     pathItems.removeLast();
-    print(pathItems.length);
     var ppp = PathItem.joinPath(pathItems);
-    print("ppppppp=="+ppp);
     loadFileAsset(context: context, rootPath: rootPath, path: ppp, isArrow: false);
   }
 }

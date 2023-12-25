@@ -23,16 +23,6 @@ class UserInfo extends StatelessWidget {
 
         ],),
         const Divider(height: 0,),
-        ExInfoCard(title: '网络配置',children: [
-          OutlinedButton(
-            child:  const Text("重置系统"),
-            onPressed: () {
-
-
-            },
-          )
-
-        ],),
         const Divider(height: 0,),
         ExInfoCard(title: '系统配置',children: [
           OutlinedButton(
