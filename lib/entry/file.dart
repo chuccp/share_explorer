@@ -63,6 +63,17 @@ class PathItem {
     }
     return pathItems;
   }
+
+  static String joinPath(List<PathItem> list) {
+    if (list.length == 1) {
+      return "/";
+    }
+    var pathTemp = "";
+    for (var path in list.skip(1)) {
+      pathTemp = "$pathTemp/${path.name}";
+    }
+    return pathTemp;
+  }
 }
 
 void main() {

@@ -37,7 +37,7 @@ class FileOperate {
 
   static void download({required String rootPath, required String path_}) async {
     String? token = await LocalStore.getToken();
-    var url = "${HttpClient.getBaseUrl()}file/download?Path=$path_&RootPath=$rootPath&Token=$token";
+    var url = "${HttpClient.getBaseUrl()}file/download?Path=${Uri.encodeComponent(path_)}&RootPath=${Uri.encodeComponent(rootPath)}&Token=${Uri.encodeComponent(token!)}";
     downloadUrl(url);
   }
 
