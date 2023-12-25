@@ -68,11 +68,9 @@ class PathItem {
     if (list.length == 1) {
       return "/";
     }
-    var pathTemp = "";
-    for (var path in list.skip(1)) {
-      pathTemp = "$pathTemp/${path.name}";
-    }
-    return pathTemp;
+    var path_ = list.last.path;
+    path_ = path_.replaceAll("\\", "/");
+    return path_;
   }
 }
 
