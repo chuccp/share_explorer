@@ -100,8 +100,8 @@ class UserOperate {
   }
 
   static Future<Response> addAdminUser(
-      {required String username, required String password, required String rePassword, required bool isNatClient, required bool isNatServer, required List<String> addresses}) async {
-    var postData = {"username": username, "password": password, "rePassword": rePassword, "isNatClient": isNatClient, "isNatServer": isNatServer, "addresses": addresses};
+      {required String username, required String password, required String rePassword, required bool isServer, required bool isNatServer, required List<String> addresses}) async {
+    var postData = {"username": username, "password": password, "rePassword": rePassword, "isServer": isServer, "isNatServer": isNatServer, "addresses": addresses};
     var url = "${HttpClient.getBaseUrl()}user/addAdmin";
     var response = await HttpClient.postJson(url, jsonEncode(postData));
     var data = response.data;

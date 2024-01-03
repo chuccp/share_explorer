@@ -1,8 +1,8 @@
 class ServerSettingItem {
-  ServerSettingItem({this.username, this.password, this.rePassword, this.useNatSelected, this.beNatSelected});
+  ServerSettingItem({this.username, this.password, this.rePassword, this.isServer, this.isNatServer});
 
-  bool? useNatSelected;
-  bool? beNatSelected;
+  bool? isServer;
+  bool? isNatServer;
   String? username;
   String? password;
   String? rePassword;

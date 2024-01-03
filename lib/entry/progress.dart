@@ -52,10 +52,7 @@ class Progress {
     isDownload = false;
     isStop = true;
     isCancel = true;
-    if (!isCancel) {
-      return doCancel();
-    }
-    return Future.value(true);
+    return doCancel();
   }
 
   Future<bool> resume() {
@@ -93,7 +90,7 @@ class Progress {
   Future<bool> exec(String path, String rootPath) {
     count = 0;
     startTime = DateTime.now().millisecondsSinceEpoch;
-    return uploadNewFile2(
+    return uploadNewFile(
         path: path,
         pickerResult: pickerResult,
         rootPath: rootPath,
@@ -127,10 +124,10 @@ class Progress {
   String? rootPath;
   int startIndex = 0;
 
-  Future<bool> uploadNewFile2({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
+  Future<bool> uploadNewFile({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
     PlatformFile? platformFile = pickerResult?.files.first;
     if (platformFile != null) {
-      url = "${HttpClient.getBaseUrl()}file/upload2";
+      url = "${HttpClient.getBaseUrl()}file/upload";
       sizeList = splitNumber(platformFile.size, 100);
       chunkedStreamReader = ChunkedStreamReader(platformFile.readStream!);
       this.progressCallback = progressCallback;
@@ -144,9 +141,17 @@ class Progress {
     return Future.value(false);
   }
 
-  Future<bool> doCancel() {
-    if (chunkedStreamReader != null) {
-      chunkedStreamReader!.cancel();
+  Future<bool> doCancel() async {
+    if (!isDone!) {
+      if (chunkedStreamReader != null) {
+        chunkedStreamReader!.cancel();
+      }
+      var url = "${HttpClient.getBaseUrl()}file/cancelUpload";
+      var response = await HttpClient.get(url, queryParameters: {"size": size, "total": total, "count": sizeList!.length, "path": path, "rootPath": rootPath, "name": name});
+      if (response.statusCode != 200) {
+        return Future.value(false);
+      }
+      return Future.value(true);
     }
     return Future.value(true);
   }

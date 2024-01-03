@@ -41,10 +41,10 @@ class FileOperate {
     downloadUrl(url);
   }
 
-  static Future<bool> uploadNewFile2({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
+  static Future<bool> uploadNewFile({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
     PlatformFile? platformFile = pickerResult?.files.first;
     if (platformFile != null) {
-      var url = "${HttpClient.getBaseUrl()}file/upload2";
+      var url = "${HttpClient.getBaseUrl()}file/upload";
       var sizeList = splitNumber(platformFile.size, 100);
       var chunkedStreamReader = ChunkedStreamReader(platformFile.readStream!);
       int uploadNum = 0;

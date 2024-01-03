@@ -45,7 +45,7 @@ class SetSignUpController {
   final TextEditingController rePasswordController = TextEditingController();
 
   ServerSettingItem get serverSettingItem =>
-      ServerSettingItem(username: usernameController.text, password: passwordController.text, rePassword: rePasswordController.text, useNatSelected: useNatSelected, beNatSelected: beNatSelected);
+      ServerSettingItem(username: usernameController.text, password: passwordController.text, rePassword: rePasswordController.text, isServer: useNatSelected, isNatServer: beNatSelected);
 }
 
 class SetSignUp extends StatefulWidget {
@@ -90,8 +90,8 @@ class _SetSignUpState extends State<SetSignUp> {
               widget.setSignUpController.useNatSelected = value!;
             });
           },
-          subtitle: const Text('连接节点，使用NAT穿透服务'),
-          title: const Text('是否使用NAT穿透服务'),
+          subtitle: const Text('使用NAT穿透服务'),
+          title: const Text('作为服务端'),
         ),
         CheckboxListTile(
           controlAffinity: ListTileControlAffinity.leading,
@@ -101,8 +101,8 @@ class _SetSignUpState extends State<SetSignUp> {
               widget.setSignUpController.beNatSelected = value!;
             });
           },
-          subtitle: const Text('作为节点，提供NAT穿透服务'),
-          title: const Text('是否提供NAT穿透服务'),
+          subtitle: const Text('提供NAT穿透服务'),
+          title: const Text('作为NAT节点'),
         ),
       ]),
     );
@@ -148,8 +148,8 @@ class _NetSetPageState extends State<NetSetPage> {
                         username: widget.signUpInfo.username!,
                         password: widget.signUpInfo.password!,
                         rePassword: widget.signUpInfo.rePassword!,
-                        isNatClient: widget.signUpInfo.useNatSelected!,
-                        isNatServer: widget.signUpInfo.beNatSelected!,
+                        isServer: widget.signUpInfo.isServer!,
+                        isNatServer: widget.signUpInfo.isNatServer!,
                         addresses: addressControllers!.addressStr)
                     .then((value) {
                   if (value.isOK()) {
