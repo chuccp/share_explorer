@@ -11,8 +11,8 @@ class HttpClient {
     return await httpClient.get(url, queryParameters: queryParameters, options: await getOptions());
   }
 
-  static Future<Response<dynamic>> postJson(String url, Object? body) async {
-    return await httpClient.post(url, data: body, options: await getOptions());
+  static Future<Response<dynamic>> postJson(String url,{Object? body,Map<String, dynamic>? queryParameters} ) async {
+    return await httpClient.post(url, data: body, queryParameters:queryParameters,options: await getOptions());
   }
 
   static Future<Options> getOptions() async {

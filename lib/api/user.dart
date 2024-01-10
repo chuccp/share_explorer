@@ -52,7 +52,7 @@ class UserOperate {
       "name": name,
       "path": path,
     };
-    var response = await HttpClient.postJson(url, jsonEncode(postData));
+    var response = await HttpClient.postJson(url, body:jsonEncode(postData));
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -65,7 +65,7 @@ class UserOperate {
       "id": id,
       "path": path,
     };
-    var response = await HttpClient.postJson(url, jsonEncode(postData));
+    var response = await HttpClient.postJson(url, body:jsonEncode(postData));
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -103,7 +103,7 @@ class UserOperate {
       {required String username, required String password, required String rePassword, required bool isServer, required bool isNatServer, required List<String> addresses}) async {
     var postData = {"username": username, "password": password, "rePassword": rePassword, "isServer": isServer, "isNatServer": isNatServer, "addresses": addresses};
     var url = "${HttpClient.getBaseUrl()}user/addAdmin";
-    var response = await HttpClient.postJson(url, jsonEncode(postData));
+    var response = await HttpClient.postJson(url,body: jsonEncode(postData));
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -112,7 +112,7 @@ class UserOperate {
   static Future<Response> addClient({required List<String> addresses}) async {
     var postData = {"addresses": addresses};
     var url = "${HttpClient.getBaseUrl()}user/addClient";
-    var response = await HttpClient.postJson(url, jsonEncode(postData));
+    var response = await HttpClient.postJson(url, body:jsonEncode(postData));
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -134,7 +134,7 @@ class UserOperate {
   static Future<Response> addUser({required String username, required String password, required String pathIds}) async {
     var postData = {"username": username, "password": password, "pathIds": pathIds};
     var url = "${HttpClient.getBaseUrl()}user/addUser";
-    var response = await HttpClient.postJson(url, postData);
+    var response = await HttpClient.postJson(url, body:postData);
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -143,7 +143,7 @@ class UserOperate {
   static Future<Response> editUser({required int id, required String username, required String password, required String pathIds}) async {
     var postData = {"id": id, "username": username, "password": password, "pathIds": pathIds};
     var url = "${HttpClient.getBaseUrl()}user/editUser";
-    var response = await HttpClient.postJson(url, postData);
+    var response = await HttpClient.postJson(url, body:postData);
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -177,7 +177,7 @@ class UserOperate {
 
   static Future<Response> signIn({required String username, required String password}) async {
     var url = "${HttpClient.getBaseUrl()}user/signIn";
-    var response = await HttpClient.postJson(url, {"username": username, "password": password});
+    var response = await HttpClient.postJson(url,body:{"username": username, "password": password},queryParameters:{"username": username});
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
