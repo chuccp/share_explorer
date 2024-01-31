@@ -34,16 +34,16 @@ class LoadPage extends StatelessWidget {
       ExCache.saveInfoItem(value);
       if (value.hasInit!) {
         if (value.hasSignIn!) {
-          GoRouter.of(context).replace("/file", extra: {"info": value});
+          GoRouter.of(context).replace("/file");
         } else {
           if (value.isServer!) {
-            GoRouter.of(context).replace("/serverLogin", extra: {"info": value});
+            GoRouter.of(context).replace("/serverLogin");
           } else {
-            GoRouter.of(context).replace("/clientLogin", extra: {"info": value});
+            GoRouter.of(context).replace("/clientLogin");
           }
         }
       } else {
-        GoRouter.of(context).replace("/choose", extra: {"info": value});
+        GoRouter.of(context).replace("/choose");
       }
     });
     return ExLoading();
@@ -51,10 +51,7 @@ class LoadPage extends StatelessWidget {
 }
 
 class ChoosePage extends StatelessWidget {
-  const ChoosePage({super.key, required this.infoItem});
-
-  final InfoItem infoItem;
-
+  const ChoosePage({super.key});
   @override
   Widget build(BuildContext context) {
     ExRadioEditingController exRadioEditingController = ExRadioEditingController(values: [ExRadioValue(label: '服务器模式', value: 'server'), ExRadioValue(label: '客户端模式', value: 'client')]);
@@ -71,9 +68,9 @@ class ChoosePage extends StatelessWidget {
                 rightButtonText: '下一步',
                 onRightPressed: () {
                   if (exRadioEditingController.selectValue == "client") {
-                    GoRouter.of(context).push("/clientSetting", extra: {"info": infoItem});
+                    GoRouter.of(context).push("/clientSetting");
                   } else {
-                    GoRouter.of(context).push("/serverSetting", extra: {"info": infoItem});
+                    GoRouter.of(context).push("/serverSetting");
                   }
                 })));
   }

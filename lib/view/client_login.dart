@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_explorer/entry/response.dart';
@@ -6,15 +7,16 @@ import '../api/user.dart';
 import '../component/ex_card.dart';
 import '../component/ex_dialog.dart';
 import '../component/ex_dialog_loading.dart';
+import '../component/ex_file_select.dart';
 import '../component/ex_load.dart';
 import '../component/ex_login.dart';
 import '../entry/info.dart';
 import '../util/local_store.dart';
 
 class ClientLoginPage extends StatefulWidget {
-  const ClientLoginPage({super.key, required this.infoItem});
+  const ClientLoginPage({super.key});
 
-  final InfoItem infoItem;
+
 
   @override
   State<StatefulWidget> createState() => _ClientLoginState();
@@ -75,6 +77,12 @@ class _ClientLoginState extends State<ClientLoginPage> {
           ),
           // footer: FooterButtonGroup(width: 240,leftFex:12,rightFex: 8,leftButtonText: "切换用户", onLeftPressed: () {}, rightButtonText: '登录', onRightPressed: () {})),
           footer: FooterButtonGroup(
+              leftFex: 20,
+              rightFex: 15,
+              leftButtonText: "添加证书",
+              onLeftPressed: () {
+                GoRouter.of(context).push("/certUploadPage");
+              },
               rightButtonText: '登录',
               onRightPressed: () {
                 TextController? loadingTitleController = TextController("查找节点并登录中...");
@@ -87,7 +95,7 @@ class _ClientLoginState extends State<ClientLoginPage> {
                       return Future.value(true);
                     },
                     onSucceed: () {
-                      GoRouter.of(context).replace("/file", extra: {"info": widget.infoItem});
+                      GoRouter.of(context).replace("/file");
                     },
                     onLoading: () {
                       userLogin = _UserLogin();

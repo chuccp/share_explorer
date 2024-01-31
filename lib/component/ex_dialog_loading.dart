@@ -3,17 +3,23 @@ import 'package:flutter/material.dart';
 import 'ex_card.dart';
 import 'ex_load.dart';
 
-typedef FutureValueCallback = Future<bool> Function();
+typedef FutureBoolCallback = Future<bool> Function();
+
+typedef FutureValueCallback = Future<dynamic> Function();
+
+typedef VoidValueCallback = void Function(dynamic);
 
 Future<bool?> exShowDialogLoading(
     {required BuildContext context,
-    required FutureValueCallback onLoading,
-    FutureValueCallback? onClose,
-    FutureValueCallback? onCancel,
+     FutureBoolCallback? onLoading,
+    FutureBoolCallback? onClose,
+       FutureValueCallback? onLoadingData,
+      VoidValueCallback? onFinish,
+    FutureBoolCallback? onCancel,
     VoidCallback? onSucceed,
     Widget? title,
     String? tip,
-      TextController? loadingTitleController}) {
+    TextController? loadingTitleController}) {
   return showDialog<bool>(
     context: context,
     barrierColor: const Color(0x7F000000),
@@ -27,43 +33,56 @@ Future<bool?> exShowDialogLoading(
         onCancel: onCancel,
         onSucceed: onSucceed,
         loadingTitleController: loadingTitleController,
+        onLoadingData: onLoadingData,
+        onFinish: onFinish,
       );
     },
   );
 }
 
 class _DialogInfoWidget extends StatelessWidget {
-  const _DialogInfoWidget({this.title, this.tip, required this.onLoading, this.onClose, this.onCancel, this.onSucceed, this.loadingTitleController});
+  const _DialogInfoWidget({this.title, this.tip, this.onLoading, this.onClose, this.onCancel, this.onSucceed, this.loadingTitleController, this.onLoadingData, this.onFinish});
 
   final Widget? title;
   final String? tip;
-  final FutureValueCallback onLoading;
-  final FutureValueCallback? onClose;
-  final FutureValueCallback? onCancel;
+  final FutureBoolCallback? onLoading;
+  final FutureValueCallback? onLoadingData;
+  final FutureBoolCallback? onClose;
+  final FutureBoolCallback? onCancel;
   final VoidCallback? onSucceed;
+  final VoidValueCallback? onFinish;
   final TextController? loadingTitleController;
 
   @override
   Widget build(BuildContext context) {
-    onLoading().then((value) {
-      if (value) {
-        if (onClose != null) {
-          onClose!().then((value) {
-            if (value) {
-              Navigator.of(context).pop(true);
-              if (onSucceed != null) {
-                onSucceed!();
+    if (onLoading != null) {
+      onLoading!().then((value) {
+        if (value) {
+          if (onClose != null) {
+            onClose!().then((value) {
+              if (value) {
+                Navigator.of(context).pop(true);
+                if (onSucceed != null) {
+                  onSucceed!();
+                }
               }
+            });
+          } else {
+            Navigator.of(context).pop(true);
+            if (onSucceed != null) {
+              onSucceed!();
             }
-          });
-        } else {
-          Navigator.of(context).pop(true);
-          if (onSucceed != null) {
-            onSucceed!();
           }
         }
-      }
-    });
+      });
+    } else if (onLoadingData != null) {
+      onLoadingData!().then((value) {
+        Navigator.of(context).pop(true);
+        if (onFinish != null) {
+          onFinish!(value);
+        }
+      });
+    }
     return AlertDialog(
       title: title,
       contentPadding: EdgeInsets.zero,

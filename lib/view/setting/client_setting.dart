@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -14,10 +12,12 @@ import '../../entry/address.dart';
 import '../../entry/info.dart';
 import 'package:file_picker/file_picker.dart';
 
-class ClientSettingPage extends StatefulWidget {
-  const ClientSettingPage({super.key, required this.infoItem});
+import '../../util/cache.dart';
 
-  final InfoItem infoItem;
+class ClientSettingPage extends StatefulWidget {
+  const ClientSettingPage({super.key});
+
+
 
   @override
   State<StatefulWidget> createState() => _ClientSettingPageState();
@@ -28,7 +28,8 @@ class _ClientSettingPageState extends State<ClientSettingPage> {
 
   @override
   void initState() {
-    addressControllers = AddressControllers(addresses: widget.infoItem.addresses!);
+    InfoItem?  infoItem = ExCache.getInfoItem();
+    addressControllers = AddressControllers(addresses: infoItem!.addresses!);
   }
 
   @override
@@ -41,14 +42,12 @@ class _ClientSettingPageState extends State<ClientSettingPage> {
           body: AddressInputGroup(
               addressControllers: addressControllers!,
               testCallback: (value) {
-                UserOperate.connect(address: value.toString()).then((value) => {
-                      if (value.isOK()) {alertDialog(context: context, msg: value.data)}
-                    });
+                UserOperate.connect(address: value.toString(), context: context);
               }),
           footer: FooterButtonGroup(
-            rightButtonText: '下一步',
+            rightButtonText: '设置',
             onRightPressed: () {
-              GoRouter.of(context).push("/certUploadPage", extra: {"info": widget.infoItem, "addresses": addressControllers!.addressStr});
+              UserOperate.addClient(addresses: addressControllers!.addressStr).then((value) => {GoRouter.of(context).push("/certUploadPage")});
             },
             leftButtonText: '上一步',
             onLeftPressed: () {
@@ -60,11 +59,7 @@ class _ClientSettingPageState extends State<ClientSettingPage> {
 }
 
 class CertUploadPage extends StatelessWidget {
-  const CertUploadPage({super.key, required this.infoItem, required this.addresses});
-
-  final InfoItem infoItem;
-
-  final List<String> addresses;
+  const CertUploadPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +73,9 @@ class CertUploadPage extends StatelessWidget {
         rightButtonText: '上传',
         onRightPressed: () {
           if (filePickerResult != null) {
-            UserOperate.uploadUserCert(pickerResult: filePickerResult, progressCallback: (int count, int total) {}, addresses: addresses).then((value) {
+            UserOperate.uploadUserCert(pickerResult: filePickerResult, progressCallback: (int count, int total) {}).then((value) {
               if (value) {
-                GoRouter.of(context).push("/findServerPage", extra: {"info": infoItem});
+                GoRouter.of(context).replace("/clientLogin");
               }
             });
           }
@@ -108,10 +103,7 @@ class CertUploadPage extends StatelessWidget {
 }
 
 class FindServerPage extends StatefulWidget {
-  const FindServerPage({super.key, required this.infoItem});
-
-  final InfoItem infoItem;
-
+  const FindServerPage({super.key});
   @override
   State<StatefulWidget> createState() => _FindServerPageState();
 }
@@ -128,7 +120,7 @@ class _FindServerPageState extends State<FindServerPage> {
               DiscoverOperate.nodeStatus().then((value) => {
                     if (value)
                       {
-                        GoRouter.of(context).replace("/clientLogin", extra: {"info": widget.infoItem})
+                        GoRouter.of(context).replace("/clientLogin")
                       }
                     else
                       {

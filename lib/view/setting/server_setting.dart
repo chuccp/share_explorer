@@ -7,12 +7,12 @@ import '../../component/ex_address_input.dart';
 import '../../component/ex_card.dart';
 import '../../component/ex_dialog.dart';
 import '../../entry/setting.dart';
+import '../../util/cache.dart';
 import '../../util/local_store.dart';
 
 class ServerSetting extends StatelessWidget {
-  const ServerSetting({super.key, required this.infoItem});
+  const ServerSetting({super.key});
 
-  final InfoItem infoItem;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class ServerSetting extends StatelessWidget {
           footer: FooterButtonGroup(
               rightButtonText: '下一步',
               onRightPressed: () {
-                GoRouter.of(context).push("/serverNetSetting", extra: {"info": infoItem, "signUpInfo": setSignUpController.serverSettingItem});
+                GoRouter.of(context).push("/serverNetSetting", extra: {"signUpInfo": setSignUpController.serverSettingItem});
               },
               leftButtonText: '上一步',
               onLeftPressed: () {
@@ -110,11 +110,8 @@ class _SetSignUpState extends State<SetSignUp> {
 }
 
 class NetSetPage extends StatefulWidget {
-  const NetSetPage({super.key, required this.infoItem, required this.signUpInfo});
-
-  final InfoItem infoItem;
+  const NetSetPage({super.key,  required this.signUpInfo});
   final ServerSettingItem signUpInfo;
-
   @override
   State<StatefulWidget> createState() => _NetSetPageState();
 }
@@ -124,7 +121,8 @@ class _NetSetPageState extends State<NetSetPage> {
 
   @override
   void initState() {
-    addressControllers = AddressControllers(addresses: widget.infoItem.addresses!);
+    InfoItem?  infoItem = ExCache.getInfoItem();
+    addressControllers = AddressControllers(addresses: infoItem!.addresses!);
   }
 
   @override
@@ -137,9 +135,7 @@ class _NetSetPageState extends State<NetSetPage> {
           body: AddressInputGroup(
               addressControllers: addressControllers!,
               testCallback: (value) {
-                UserOperate.connect(address: value.toString()).then((value) => {
-                      if (value.isOK()) {alertDialog(context: context, msg: value.data)}
-                    });
+                UserOperate.connect(address: value.toString(), context: context);
               }),
           footer: FooterButtonGroup(
               rightButtonText: '设置',
@@ -154,7 +150,7 @@ class _NetSetPageState extends State<NetSetPage> {
                     .then((value) {
                   if (value.isOK()) {
                     LocalStore.saveToken(token: value.data, expires: const Duration(days: 1)).then((value) {
-                      GoRouter.of(context).push("/certPage", extra: {"info": widget.infoItem});
+                      GoRouter.of(context).push("/certPage");
                     });
                   }
                 });
@@ -168,9 +164,8 @@ class _NetSetPageState extends State<NetSetPage> {
 }
 
 class CertPage extends StatelessWidget {
-  const CertPage({super.key, required this.infoItem});
+  const CertPage({super.key});
 
-  final InfoItem infoItem;
 
   @override
   Widget build(BuildContext context) {

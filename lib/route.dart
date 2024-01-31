@@ -25,70 +25,49 @@ GoRouter getRoute() {
                   GoRoute(
                       path: 'choose',
                       builder: (context, state) {
-                        final Map<String, InfoItem> params = state.extra! as Map<String, InfoItem>;
-                        final InfoItem info = params['info']!;
-                        return ChoosePage(infoItem: info);
+                        return const ChoosePage();
                       }),
                   GoRoute(
                       path: 'clientSetting',
                       builder: (context, state) {
-                        final Map<String, InfoItem> params = state.extra! as Map<String, InfoItem>;
-                        final InfoItem info = params['info']!;
-                        return ClientSettingPage(infoItem: info);
+                        return const ClientSettingPage();
                       }),
                   GoRoute(
                       path: 'certUploadPage',
                       builder: (context, state) {
-                        final Map<String, dynamic> params = state.extra! as Map<String, dynamic>;
-                        final InfoItem info = params['info']!;
-                        final List<String> addresses = params['addresses']!;
-                        return CertUploadPage(
-                          infoItem: info,
-                          addresses: addresses,
-                        );
+                        return const CertUploadPage( );
                       }),
                   GoRoute(
                       path: 'clientLogin',
                       builder: (context, state) {
-                        final Map<String, InfoItem> params = state.extra! as Map<String, InfoItem>;
-                        final InfoItem info = params['info']!;
-                        return ClientLoginPage(infoItem: info);
+                        return const ClientLoginPage();
                       }),
                   GoRoute(
                       path: 'serverSetting',
                       builder: (context, state) {
-                        final Map<String, InfoItem> params = state.extra! as Map<String, InfoItem>;
-                        final InfoItem info = params['info']!;
-                        return ServerSetting(infoItem: info);
+                        return const ServerSetting();
                       }),
                   GoRoute(
                       path: 'serverNetSetting',
                       builder: (context, state) {
                         final Map<String, dynamic> params = state.extra! as Map<String, dynamic>;
-                        final InfoItem info = params['info']!;
                         final ServerSettingItem signUpInfo = params['signUpInfo']!;
-                        return NetSetPage(infoItem: info, signUpInfo: signUpInfo);
+                        return NetSetPage(signUpInfo: signUpInfo);
                       }),
                   GoRoute(
                       path: 'findServerPage',
                       builder: (context, state) {
-                        final Map<String, dynamic> params = state.extra! as Map<String, dynamic>;
-                        final InfoItem info = params['info']!;
-                        return FindServerPage(infoItem: info);
+                        return FindServerPage();
                       }),
                   GoRoute(
                       path: 'certPage',
                       builder: (context, state) {
-                        final Map<String, InfoItem> params = state.extra! as Map<String, InfoItem>;
-                        final InfoItem info = params['info']!;
-                        return CertPage(infoItem: info);
+                        return const CertPage();
                       }),
                   GoRoute(
                       path: 'serverLogin',
                       builder: (context, state) {
-                        final Map<String, InfoItem> params = state.extra! as Map<String, InfoItem>;
-                        final InfoItem info = params['info']!;
-                        return ServerLoginPage(infoItem: info);
+                        return const ServerLoginPage();
                       }),
                 ]),
           ]),

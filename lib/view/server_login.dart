@@ -9,9 +9,9 @@ import '../generated/l10n.dart';
 import '../util/local_store.dart';
 
 class ServerLoginPage extends StatefulWidget {
-  const ServerLoginPage({super.key, required this.infoItem});
+  const ServerLoginPage({super.key});
 
-  final InfoItem infoItem;
+
 
   @override
   State<StatefulWidget> createState() => _ServerLoginState();
@@ -36,7 +36,7 @@ class _ServerLoginState extends State<ServerLoginPage> {
                 UserOperate.signIn(username: exLoginController.username, password: exLoginController.password).then((value) {
                   if (value.isOK()) {
                     LocalStore.saveToken(token: value.data,expires: const Duration(days: 1)).then((value) {
-                      GoRouter.of(context).replace("/file", extra: {"info": widget.infoItem});
+                      GoRouter.of(context).replace("/file");
                     });
                   }
                 });

@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:share_explorer/component/ex_dialog_loading.dart';
 import '../component/ex_dialog.dart';
+import '../component/ex_load.dart';
 import '../entry/info.dart';
 import '../entry/page.dart';
 import '../entry/path.dart';
@@ -30,12 +32,23 @@ class UserOperate {
     return infoItem;
   }
 
-  static Future<Response> connect({required String address}) async {
+  static void connect({required String address, required BuildContext context}) {
     var url = "${HttpClient.getBaseUrl()}user/connect?address=$address";
-    var response = await HttpClient.get(url);
-    var data = response.data;
-    var res = Response.fromJson(data);
-    return res;
+    exShowDialogLoading(
+        title: const Text("网络测试中"),
+        context: context,
+        onFinish: (value) {
+          if (value.isOK()) {
+            alertDialog(context: context, msg: value.data);
+          } else {
+            alertDialog(context: context, msg: value.error!);
+          }
+        },
+        onLoadingData: () {
+          return HttpClient.get(url).then((response) => response.data).then((data) => Response.fromJson(data)).then((value) {
+            return value;
+          });
+        });
   }
 
   static Future<Response<ExPage<ExPath>>> queryPath({required int pageNo, required int pageSize}) async {
@@ -52,7 +65,7 @@ class UserOperate {
       "name": name,
       "path": path,
     };
-    var response = await HttpClient.postJson(url, body:jsonEncode(postData));
+    var response = await HttpClient.postJson(url, body: jsonEncode(postData));
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -65,7 +78,7 @@ class UserOperate {
       "id": id,
       "path": path,
     };
-    var response = await HttpClient.postJson(url, body:jsonEncode(postData));
+    var response = await HttpClient.postJson(url, body: jsonEncode(postData));
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -103,7 +116,7 @@ class UserOperate {
       {required String username, required String password, required String rePassword, required bool isServer, required bool isNatServer, required List<String> addresses}) async {
     var postData = {"username": username, "password": password, "rePassword": rePassword, "isServer": isServer, "isNatServer": isNatServer, "addresses": addresses};
     var url = "${HttpClient.getBaseUrl()}user/addAdmin";
-    var response = await HttpClient.postJson(url,body: jsonEncode(postData));
+    var response = await HttpClient.postJson(url, body: jsonEncode(postData));
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -112,16 +125,16 @@ class UserOperate {
   static Future<Response> addClient({required List<String> addresses}) async {
     var postData = {"addresses": addresses};
     var url = "${HttpClient.getBaseUrl()}user/addClient";
-    var response = await HttpClient.postJson(url, body:jsonEncode(postData));
+    var response = await HttpClient.postJson(url, body: jsonEncode(postData));
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
   }
 
-  static Future<bool> uploadUserCert({required List<String> addresses, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
+  static Future<bool> uploadUserCert({required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
     PlatformFile? platformFile = pickerResult?.files.first;
     if (platformFile != null) {
-      final formData = dio.FormData.fromMap({'addresses': addresses.join(";"), 'cert': dio.MultipartFile.fromStream(() => platformFile.readStream!, platformFile.size, filename: platformFile.name)});
+      final formData = dio.FormData.fromMap({'cert': dio.MultipartFile.fromStream(() => platformFile.readStream!, platformFile.size, filename: platformFile.name)});
       var url = "${HttpClient.getBaseUrl()}user/uploadUserCert";
       var response = await HttpClient.postFile(url, data: formData, onSendProgress: progressCallback);
       if (response.statusCode == 200) {
@@ -134,7 +147,7 @@ class UserOperate {
   static Future<Response> addUser({required String username, required String password, required String pathIds}) async {
     var postData = {"username": username, "password": password, "pathIds": pathIds};
     var url = "${HttpClient.getBaseUrl()}user/addUser";
-    var response = await HttpClient.postJson(url, body:postData);
+    var response = await HttpClient.postJson(url, body: postData);
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -143,7 +156,7 @@ class UserOperate {
   static Future<Response> editUser({required int id, required String username, required String password, required String pathIds}) async {
     var postData = {"id": id, "username": username, "password": password, "pathIds": pathIds};
     var url = "${HttpClient.getBaseUrl()}user/editUser";
-    var response = await HttpClient.postJson(url, body:postData);
+    var response = await HttpClient.postJson(url, body: postData);
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
@@ -177,7 +190,7 @@ class UserOperate {
 
   static Future<Response> signIn({required String username, required String password}) async {
     var url = "${HttpClient.getBaseUrl()}user/signIn";
-    var response = await HttpClient.postJson(url,body:{"username": username, "password": password},queryParameters:{"username": username});
+    var response = await HttpClient.postJson(url, body: {"username": username, "password": password}, queryParameters: {"username": username});
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
