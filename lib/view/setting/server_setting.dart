@@ -13,7 +13,6 @@ import '../../util/local_store.dart';
 class ServerSetting extends StatelessWidget {
   const ServerSetting({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     SetSignUpController setSignUpController = SetSignUpController();
@@ -110,8 +109,10 @@ class _SetSignUpState extends State<SetSignUp> {
 }
 
 class NetSetPage extends StatefulWidget {
-  const NetSetPage({super.key,  required this.signUpInfo});
+  const NetSetPage({super.key, required this.signUpInfo});
+
   final ServerSettingItem signUpInfo;
+
   @override
   State<StatefulWidget> createState() => _NetSetPageState();
 }
@@ -121,7 +122,7 @@ class _NetSetPageState extends State<NetSetPage> {
 
   @override
   void initState() {
-    InfoItem?  infoItem = ExCache.getInfoItem();
+    InfoItem? infoItem = ExCache.getInfoItem();
     addressControllers = AddressControllers(addresses: infoItem!.addresses!);
   }
 
@@ -149,7 +150,7 @@ class _NetSetPageState extends State<NetSetPage> {
                         addresses: addressControllers!.addressStr)
                     .then((value) {
                   if (value.isOK()) {
-                    LocalStore.saveToken(token: value.data, expires: const Duration(days: 1)).then((value) {
+                    LocalStore.saveToken(token: value.data, code: "",username: widget.signUpInfo.username!, expires: const Duration(days: 1)).then((value) {
                       GoRouter.of(context).push("/certPage");
                     });
                   }
@@ -165,7 +166,6 @@ class _NetSetPageState extends State<NetSetPage> {
 
 class CertPage extends StatelessWidget {
   const CertPage({super.key});
-
 
   @override
   Widget build(BuildContext context) {

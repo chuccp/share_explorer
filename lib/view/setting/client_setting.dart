@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_explorer/component/ex_load.dart';
 import '../../api/discover.dart';
@@ -17,8 +18,6 @@ import '../../util/cache.dart';
 class ClientSettingPage extends StatefulWidget {
   const ClientSettingPage({super.key});
 
-
-
   @override
   State<StatefulWidget> createState() => _ClientSettingPageState();
 }
@@ -28,7 +27,7 @@ class _ClientSettingPageState extends State<ClientSettingPage> {
 
   @override
   void initState() {
-    InfoItem?  infoItem = ExCache.getInfoItem();
+    InfoItem? infoItem = ExCache.getInfoItem();
     addressControllers = AddressControllers(addresses: infoItem!.addresses!);
   }
 
@@ -64,6 +63,7 @@ class CertUploadPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FilePickerResult? filePickerResult;
+    TextEditingController codeController = TextEditingController();
     return ExCardLayout(
         child: ExCard(
       title: "证书上传",
@@ -73,11 +73,7 @@ class CertUploadPage extends StatelessWidget {
         rightButtonText: '上传',
         onRightPressed: () {
           if (filePickerResult != null) {
-            UserOperate.uploadUserCert(pickerResult: filePickerResult, progressCallback: (int count, int total) {}).then((value) {
-              if (value) {
-                GoRouter.of(context).replace("/clientLogin");
-              }
-            });
+            UserOperate.uploadUserCert(pickerResult: filePickerResult, code: codeController.text,progressCallback: (int count, int total) {}, context: context);
           }
         },
         leftButtonText: '上一步',
@@ -94,7 +90,14 @@ class CertUploadPage extends StatelessWidget {
               filePickerCallback: (FilePickerResult? value) {
                 filePickerResult = value;
               },
-            )
+            ),
+            TextField(
+              controller: codeController,
+              decoration: const InputDecoration(
+                labelText: "本地代码",
+                helperText: "用于证书识别，只用于当前客户端，请保持唯一性",
+              ),
+            ),
           ],
         ),
       ),
@@ -104,6 +107,7 @@ class CertUploadPage extends StatelessWidget {
 
 class FindServerPage extends StatefulWidget {
   const FindServerPage({super.key});
+
   @override
   State<StatefulWidget> createState() => _FindServerPageState();
 }
@@ -119,9 +123,7 @@ class _FindServerPageState extends State<FindServerPage> {
             {
               DiscoverOperate.nodeStatus().then((value) => {
                     if (value)
-                      {
-                        GoRouter.of(context).replace("/clientLogin")
-                      }
+                      {GoRouter.of(context).replace("/clientLogin")}
                     else
                       {
                         if (!hasDispose) {query(context)}

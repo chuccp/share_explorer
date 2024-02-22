@@ -11,4 +11,8 @@ class ExCache {
   static InfoItem? getInfoItem(){
     return  MemoryCache.instance.read('infoItem');
   }
+
+
+
+
 }

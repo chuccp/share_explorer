@@ -16,8 +16,6 @@ import '../util/local_store.dart';
 class ClientLoginPage extends StatefulWidget {
   const ClientLoginPage({super.key});
 
-
-
   @override
   State<StatefulWidget> createState() => _ClientLoginState();
 }
@@ -25,13 +23,14 @@ class ClientLoginPage extends StatefulWidget {
 class _UserLogin {
   bool _isCancel = false;
 
-  Future<bool> userLogin({required BuildContext context, required TextController? loadingTitleController, required String username, required String password}) {
-    return _userLogin(username: username, password: password).then((value) {
+  Future<bool> userLogin(
+      {required BuildContext context, required TextController? loadingTitleController, required String username, required String password, required String code, required bool start}) {
+    return _userLogin(username: username, password: password, code: code, start: start).then((value) {
       if (_isCancel) {
         return false;
       }
       if (value.code == 200) {
-        return LocalStore.saveToken(token: value.data, expires: const Duration(days: 1)).then((va) {
+        return LocalStore.saveToken(token: value.data, code: code, username:username,expires: const Duration(days: 1)).then((va) {
           return true;
         });
       } else if (value.code == 500) {
@@ -45,7 +44,7 @@ class _UserLogin {
           if (_isCancel) {
             return false;
           }
-          return userLogin(context: context, loadingTitleController: loadingTitleController, username: username, password: password);
+          return userLogin(context: context, loadingTitleController: loadingTitleController, username: username, password: password, code: code, start: false);
         });
       }
     });
@@ -55,8 +54,8 @@ class _UserLogin {
     _isCancel = true;
   }
 
-  Future<Response> _userLogin({required String username, required String password}) {
-    return UserOperate.signIn(username: username, password: password);
+  Future<Response> _userLogin({required String username, required String password, required String code, required bool start}) {
+    return UserOperate.signIn(username: username, password: password, start: start, code: code);
   }
 }
 
@@ -72,7 +71,8 @@ class _ClientLoginState extends State<ClientLoginPage> {
           height: 412,
           title: "客户端登录",
           body: ExLogin(
-            isServer: true,
+            isServer: false,
+            isClient: true,
             exLoginController: exLoginController,
           ),
           // footer: FooterButtonGroup(width: 240,leftFex:12,rightFex: 8,leftButtonText: "切换用户", onLeftPressed: () {}, rightButtonText: '登录', onRightPressed: () {})),
@@ -99,7 +99,13 @@ class _ClientLoginState extends State<ClientLoginPage> {
                     },
                     onLoading: () {
                       userLogin = _UserLogin();
-                      return userLogin.userLogin(context: context, loadingTitleController: loadingTitleController, username: exLoginController.username, password: exLoginController.password);
+                      return userLogin.userLogin(
+                          context: context,
+                          loadingTitleController: loadingTitleController,
+                          username: exLoginController.username,
+                          password: exLoginController.password,
+                          start: true,
+                          code: exLoginController.code);
                     });
               })),
     );

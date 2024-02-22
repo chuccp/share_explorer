@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:go_router/go_router.dart';
 import 'package:share_explorer/component/ex_dialog_loading.dart';
 import '../component/ex_dialog.dart';
 import '../component/ex_load.dart';
@@ -10,6 +11,7 @@ import '../entry/info.dart';
 import '../entry/page.dart';
 import '../entry/path.dart';
 import '../entry/response.dart';
+import '../entry/token.dart';
 import '../entry/user.dart';
 import '../util/download.dart';
 import '../util/http_client.dart';
@@ -131,17 +133,35 @@ class UserOperate {
     return res;
   }
 
-  static Future<bool> uploadUserCert({required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
-    PlatformFile? platformFile = pickerResult?.files.first;
-    if (platformFile != null) {
-      final formData = dio.FormData.fromMap({'cert': dio.MultipartFile.fromStream(() => platformFile.readStream!, platformFile.size, filename: platformFile.name)});
-      var url = "${HttpClient.getBaseUrl()}user/uploadUserCert";
-      var response = await HttpClient.postFile(url, data: formData, onSendProgress: progressCallback);
-      if (response.statusCode == 200) {
-        return Future.value(true);
-      }
-    }
-    return Future.value(false);
+  static void uploadUserCert({required FilePickerResult? pickerResult, required String code, required dio.ProgressCallback progressCallback, required BuildContext context}) {
+    exShowDialogLoading(
+        title: const Text("证书上传中"),
+        context: context,
+        onFinish: (value) {
+          if (value.isOK()) {
+            exShowDialog(
+                context: context,
+                title: const Text("上传成功"),
+                onPressed: () {
+                  GoRouter.of(context).replace("/clientLogin");
+                  return Future(() => true);
+                });
+          } else {
+            alertDialog(context: context, msg: value.error!);
+          }
+        },
+        onLoadingData: () {
+          PlatformFile? platformFile = pickerResult?.files.first;
+          if (platformFile != null) {
+            final formData = dio.FormData.fromMap({'code': code, 'cert': dio.MultipartFile.fromStream(() => platformFile.readStream!, platformFile.size, filename: platformFile.name)});
+            var url = "${HttpClient.getBaseUrl()}user/uploadUserCert";
+            return HttpClient.postFile(url, data: formData, onSendProgress: progressCallback).then((response) => response.data).then((data) => Response.fromJson(data)).then((value) {
+              return value;
+            });
+          } else {
+            return Future.value(false);
+          }
+        });
   }
 
   static Future<Response> addUser({required String username, required String password, required String pathIds}) async {
@@ -188,23 +208,23 @@ class UserOperate {
     return res;
   }
 
-  static Future<Response> signIn({required String username, required String password}) async {
+  static Future<Response> signIn({required String username, required String password,  String? code,required bool start}) async {
     var url = "${HttpClient.getBaseUrl()}user/signIn";
-    var response = await HttpClient.postJson(url, body: {"username": username, "password": password}, queryParameters: {"username": username});
+    var response = await HttpClient.postJson(url, body: {"username": username, "password": password}, queryParameters: {"username": username,"code": code, "start": start});
     var data = response.data;
     var res = Response.fromJson(data);
     return res;
   }
 
   static Future<void> downloadCert() async {
-    String? token = await LocalStore.getToken();
-    var url = "${HttpClient.getBaseUrl()}user/downloadCert?Token=$token";
+    ExToken? token = await LocalStore.getToken();
+    var url = "${HttpClient.getBaseUrl()}user/downloadCert?Token=${token!.token}&code=${token.code}&username=${token.username}";
     downloadUrl(url);
   }
 
   static Future<void> downloadUserCert({required String username}) async {
-    String? token = await LocalStore.getToken();
-    var url = "${HttpClient.getBaseUrl()}user/downloadUserCert?username=$username&Token=$token";
+    ExToken? token = await LocalStore.getToken();
+    var url = "${HttpClient.getBaseUrl()}user/downloadUserCert?username=$username&Token=${token!.token}&code=${token.code}&username=${token.username}";
     downloadUrl(url);
   }
 }

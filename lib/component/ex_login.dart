@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'ex_file_select.dart';
 
 class ExLoginInfo {
   ExLoginInfo({this.useSelected, this.saveSelected});
@@ -25,9 +24,15 @@ class ExLoginController extends ValueNotifier<ExLoginInfo> {
     passwordController.text = password;
   }
 
+  set code(String code) {
+    codeController.text = code;
+  }
+
   String get username => usernameController.text;
 
   String get password => passwordController.text;
+
+  String get code => codeController.text;
 
   set useSelected(bool useSelected) {
     value.useSelected = useSelected;
@@ -43,13 +48,17 @@ class ExLoginController extends ValueNotifier<ExLoginInfo> {
 
   TextEditingController usernameController = TextEditingController();
 
+  TextEditingController codeController = TextEditingController();
+
   TextEditingController passwordController = TextEditingController();
 }
 
 class ExLogin extends StatefulWidget {
-  ExLogin({super.key, this.isServer, required this.exLoginController});
+  ExLogin({super.key, this.isServer, this.isClient,required this.exLoginController});
 
   bool? isServer;
+
+  bool? isClient;
 
   ExLoginController exLoginController;
 
@@ -60,8 +69,6 @@ class ExLogin extends StatefulWidget {
 class _ExLoginState extends State<ExLogin> {
   bool _useSelected = false;
 
-  bool _saveSelected = false;
-
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -71,6 +78,14 @@ class _ExLoginState extends State<ExLogin> {
           padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
           child: Column(
             children: [
+
+              if(widget.isClient!=null && widget.isClient!)
+              TextField(
+                controller: widget.exLoginController.codeController,
+                decoration: const InputDecoration(
+                  labelText: "本地代码",
+                ),
+              ),
               TextField(
                 controller: widget.exLoginController.usernameController,
                 decoration: const InputDecoration(
@@ -84,13 +99,6 @@ class _ExLoginState extends State<ExLogin> {
                   labelText: "密码",
                 ),
               ),
-              if (!widget.isServer!)
-                ExFileSelect(
-                  labelText: '证书文件',
-                  filePickerCallback: (FilePickerResult? value) {
-                    widget.exLoginController.filePickerResult = value;
-                  },
-                ),
               CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.leading,
                 value: _useSelected,
@@ -102,20 +110,7 @@ class _ExLoginState extends State<ExLogin> {
                 },
                 subtitle: const Text('下次进入页面直接登录'),
                 title: const Text('是否记录登录信息'),
-              ),
-              if (!widget.isServer!)
-                CheckboxListTile(
-                  controlAffinity: ListTileControlAffinity.leading,
-                  value: _saveSelected,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _saveSelected = !_saveSelected;
-                      widget.exLoginController.useSelected = _saveSelected;
-                    });
-                  },
-                  subtitle: const Text('下次可免证书登录'),
-                  title: const Text('是否存储证书'),
-                )
+              )
             ],
           ),
         );

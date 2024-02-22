@@ -11,8 +11,6 @@ import '../util/local_store.dart';
 class ServerLoginPage extends StatefulWidget {
   const ServerLoginPage({super.key});
 
-
-
   @override
   State<StatefulWidget> createState() => _ServerLoginState();
 }
@@ -33,9 +31,9 @@ class _ServerLoginState extends State<ServerLoginPage> {
           footer: FooterButtonGroup(
               rightButtonText: '登录',
               onRightPressed: () {
-                UserOperate.signIn(username: exLoginController.username, password: exLoginController.password).then((value) {
+                UserOperate.signIn(username: exLoginController.username, password: exLoginController.password, start: false, code: '').then((value) {
                   if (value.isOK()) {
-                    LocalStore.saveToken(token: value.data,expires: const Duration(days: 1)).then((value) {
+                    LocalStore.saveToken(token: value.data, code: "",username:exLoginController.username , expires: const Duration(days: 1)).then((value) {
                       GoRouter.of(context).replace("/file");
                     });
                   }

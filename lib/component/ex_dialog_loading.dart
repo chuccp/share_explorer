@@ -9,11 +9,13 @@ typedef FutureValueCallback = Future<dynamic> Function();
 
 typedef VoidValueCallback = void Function(dynamic);
 
+typedef FutureBoolValueCallback = Future<bool> Function(dynamic);
+
 Future<bool?> exShowDialogLoading(
     {required BuildContext context,
-     FutureBoolCallback? onLoading,
+    FutureBoolCallback? onLoading,
     FutureBoolCallback? onClose,
-       FutureValueCallback? onLoadingData,
+    FutureValueCallback? onLoadingData,
       VoidValueCallback? onFinish,
     FutureBoolCallback? onCancel,
     VoidCallback? onSucceed,
@@ -79,7 +81,7 @@ class _DialogInfoWidget extends StatelessWidget {
       onLoadingData!().then((value) {
         Navigator.of(context).pop(true);
         if (onFinish != null) {
-          onFinish!(value);
+          return onFinish!(value);
         }
       });
     }

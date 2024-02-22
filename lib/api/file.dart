@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart' as dio;
 import '../entry/file.dart';
+import '../entry/token.dart';
 import '../util/download.dart';
 import '../util/http_client.dart';
 import '../util/local_store.dart';
@@ -36,8 +37,8 @@ class FileOperate {
   }
 
   static void download({required String rootPath, required String path_}) async {
-    String? token = await LocalStore.getToken();
-    var url = "${HttpClient.getBaseUrl()}file/download?Path=${Uri.encodeComponent(path_)}&RootPath=${Uri.encodeComponent(rootPath)}&Token=${Uri.encodeComponent(token!)}";
+    ExToken? token = await LocalStore.getToken();
+    var url = "${HttpClient.getBaseUrl()}file/download?Path=${Uri.encodeComponent(path_)}&RootPath=${Uri.encodeComponent(rootPath)}&username=${Uri.encodeComponent(token!.username!)}&code=${Uri.encodeComponent(token!.code!)}&Token=${Uri.encodeComponent(token!.token!)}";
     downloadUrl(url);
   }
 
