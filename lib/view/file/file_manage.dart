@@ -17,30 +17,29 @@ class FileManagePage extends StatefulWidget {
 }
 
 class _FileManagePageState extends State<FileManagePage> {
-
-
-
   List<ExPath> exPaths = [];
 
-  _updatePaths(List<ExPath> exPaths){
+  _updatePaths(List<ExPath> exPaths) {
     setState(() {
       this.exPaths.clear();
       this.exPaths.addAll(exPaths);
-      if(exPaths.isNotEmpty){
+      if (exPaths.isNotEmpty) {
         selectIndex = 0;
       }
     });
   }
 
-  _updateIndex(int index){
+  _updateIndex(int index) {
     setState(() {
       selectIndex = index;
     });
   }
 
-  void _queryAll(){
-    UserOperate.queryAllPath().then((value){
-      _updatePaths(value.data!.list!);
+  void _queryAll() {
+    UserOperate.queryAllPath().then((value) {
+      if (value.data != null) {
+        _updatePaths(value.data!.list!);
+      }
     });
   }
 
@@ -54,11 +53,7 @@ class _FileManagePageState extends State<FileManagePage> {
 
   @override
   Widget build(BuildContext context) {
-
-    var titles = [
-      for(var ex in exPaths)
-        ex.name!
-    ];
+    var titles = [for (var ex in exPaths) ex.name!];
 
     return Material(
         borderOnForeground: false,
@@ -85,10 +80,14 @@ class _FileManagePageState extends State<FileManagePage> {
                         color: Colors.black26,
                       ),
                       Expanded(
-                          child: ExButtonGroup(selectIndex:selectIndex,titles: titles,indexCallback:(index){
-                            _updateIndex(index);
-                          }, emptyTitle: '当前没有设置目录，请在左下角设置',)
-                          ),
+                          child: ExButtonGroup(
+                        selectIndex: selectIndex,
+                        titles: titles,
+                        indexCallback: (index) {
+                          _updateIndex(index);
+                        },
+                        emptyTitle: '当前没有设置目录，请在左下角设置',
+                      )),
                       const Divider(
                         height: 1,
                         thickness: 1,
@@ -110,16 +109,18 @@ class _FileManagePageState extends State<FileManagePage> {
                     ],
                   ),
                 ),
-                Expanded(child: Builder(builder: (BuildContext context) {
-                  if(selectIndex>=0 && exPaths.isNotEmpty){
-                    return  FileExplorer(exPath: exPaths[selectIndex],);
-                  }else{
-                    return const Text("");
-                  }
-                },))
+                Expanded(child: Builder(
+                  builder: (BuildContext context) {
+                    if (selectIndex >= 0 && exPaths.isNotEmpty) {
+                      return FileExplorer(
+                        exPath: exPaths[selectIndex],
+                      );
+                    } else {
+                      return const Text("");
+                    }
+                  },
+                ))
               ],
             )));
   }
-
-
 }

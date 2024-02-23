@@ -57,7 +57,7 @@ GoRouter getRoute() {
                   GoRoute(
                       path: 'findServerPage',
                       builder: (context, state) {
-                        return FindServerPage();
+                        return const FindServerPage();
                       }),
                   GoRoute(
                       path: 'certPage',

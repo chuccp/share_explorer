@@ -23,28 +23,29 @@ class ClientLoginPage extends StatefulWidget {
 class _UserLogin {
   bool _isCancel = false;
 
-  Future<bool> userLogin(
-      {required BuildContext context, required TextController? loadingTitleController, required String username, required String password, required String code, required bool start}) {
+  Future<bool> userLogin({required TextController loadingTitleController, required String username, required String password, required String code, required bool start}) {
+    if (_isCancel) {
+      return Future.value(false);
+    }
     return _userLogin(username: username, password: password, code: code, start: start).then((value) {
       if (_isCancel) {
         return false;
       }
       if (value.code == 200) {
-        return LocalStore.saveToken(token: value.data, code: code, username:username,expires: const Duration(days: 1)).then((va) {
+        _isCancel = true;
+        return LocalStore.saveToken(token: value.data, code: code, username: username, expires: const Duration(days: 1)).then((va) {
           return true;
         });
       } else if (value.code == 500) {
         _isCancel = true;
-        Navigator.of(context).pop(true);
-        alertDialog(context: context, msg: value.error!);
+        loadingTitleController.value = value.error!;
         return false;
       } else {
-        loadingTitleController!.value = value.error!;
         return Future.delayed(const Duration(seconds: 5)).then((value) {
           if (_isCancel) {
             return false;
           }
-          return userLogin(context: context, loadingTitleController: loadingTitleController, username: username, password: password, code: code, start: false);
+          return userLogin(loadingTitleController: loadingTitleController, username: username, password: password, code: code, start: false);
         });
       }
     });
@@ -63,7 +64,9 @@ class _ClientLoginState extends State<ClientLoginPage> {
   @override
   Widget build(BuildContext context) {
     ExLoginController exLoginController = ExLoginController();
-
+    exLoginController.username = "111111";
+    exLoginController.code = "111111";
+    exLoginController.password = "111111";
     var userLogin = _UserLogin();
     return ExCardLayout(
       child: ExCard(
@@ -87,26 +90,23 @@ class _ClientLoginState extends State<ClientLoginPage> {
               onRightPressed: () {
                 TextController? loadingTitleController = TextController("查找节点并登录中...");
                 exShowDialogLoading(
-                    context: context,
-                    title: const Text("登陆中"),
-                    loadingTitleController: loadingTitleController,
-                    onCancel: () {
-                      userLogin.cancel();
-                      return Future.value(true);
-                    },
-                    onSucceed: () {
-                      GoRouter.of(context).replace("/file");
-                    },
-                    onLoading: () {
-                      userLogin = _UserLogin();
-                      return userLogin.userLogin(
-                          context: context,
-                          loadingTitleController: loadingTitleController,
-                          username: exLoginController.username,
-                          password: exLoginController.password,
-                          start: true,
-                          code: exLoginController.code);
-                    });
+                  context: context,
+                  title: const Text("登陆中"),
+                  loadingTitleController: loadingTitleController,
+                  onLoading: () {
+                    userLogin.cancel();
+                    userLogin = _UserLogin();
+                    return userLogin.userLogin(
+                        loadingTitleController: loadingTitleController, username: exLoginController.username, password: exLoginController.password, code: exLoginController.code, start: true);
+                  },
+                ).then((value) {
+                  userLogin.cancel();
+                  if (value != null && value) {
+                    GoRouter.of(context).replace("/file");
+                  } else {
+                    userLogin.cancel();
+                  }
+                });
               })),
     );
   }

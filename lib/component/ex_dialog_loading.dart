@@ -5,6 +5,8 @@ import 'ex_load.dart';
 
 typedef FutureBoolCallback = Future<bool> Function();
 
+typedef FutureBoolBuildContextCallback = Future<bool> Function(BuildContext);
+
 typedef FutureValueCallback = Future<dynamic> Function();
 
 typedef VoidValueCallback = void Function(dynamic);
@@ -16,8 +18,8 @@ Future<bool?> exShowDialogLoading(
     FutureBoolCallback? onLoading,
     FutureBoolCallback? onClose,
     FutureValueCallback? onLoadingData,
-      VoidValueCallback? onFinish,
-    FutureBoolCallback? onCancel,
+    VoidValueCallback? onFinish,
+      VoidCallback? onCancel,
     VoidCallback? onSucceed,
     Widget? title,
     String? tip,
@@ -26,7 +28,7 @@ Future<bool?> exShowDialogLoading(
     context: context,
     barrierColor: const Color(0x7F000000),
     barrierDismissible: false,
-    builder: (context) {
+    builder: (context0) {
       return _DialogInfoWidget(
         title: title,
         tip: tip,
@@ -37,70 +39,51 @@ Future<bool?> exShowDialogLoading(
         loadingTitleController: loadingTitleController,
         onLoadingData: onLoadingData,
         onFinish: onFinish,
+        context0: context0,
       );
     },
   );
 }
 
-class _DialogInfoWidget extends StatelessWidget {
-  const _DialogInfoWidget({this.title, this.tip, this.onLoading, this.onClose, this.onCancel, this.onSucceed, this.loadingTitleController, this.onLoadingData, this.onFinish});
+class _DialogInfoWidget extends StatefulWidget {
+  const _DialogInfoWidget({this.title, this.tip, this.onLoading, this.onClose, this.onCancel, this.onSucceed, this.loadingTitleController, this.onLoadingData, this.onFinish, required this.context0});
 
+  final BuildContext context0;
   final Widget? title;
   final String? tip;
   final FutureBoolCallback? onLoading;
   final FutureValueCallback? onLoadingData;
   final FutureBoolCallback? onClose;
-  final FutureBoolCallback? onCancel;
+  final VoidCallback? onCancel;
   final VoidCallback? onSucceed;
   final VoidValueCallback? onFinish;
   final TextController? loadingTitleController;
 
   @override
-  Widget build(BuildContext context) {
-    if (onLoading != null) {
-      onLoading!().then((value) {
-        if (value) {
-          if (onClose != null) {
-            onClose!().then((value) {
-              if (value) {
-                Navigator.of(context).pop(true);
-                if (onSucceed != null) {
-                  onSucceed!();
-                }
-              }
-            });
-          } else {
-            Navigator.of(context).pop(true);
-            if (onSucceed != null) {
-              onSucceed!();
-            }
-          }
-        }
-      });
-    } else if (onLoadingData != null) {
-      onLoadingData!().then((value) {
-        Navigator.of(context).pop(true);
-        if (onFinish != null) {
-          return onFinish!(value);
-        }
+  State<StatefulWidget> createState() => _DialogInfoState();
+}
+
+class _DialogInfoState extends State<_DialogInfoWidget> {
+  @override
+  void initState() {
+    if (widget.onLoading != null) {
+      Future.delayed(const Duration(microseconds: 5)).then((value) {
+        widget.onLoading!().then((value) {
+          Navigator.of(context).pop(value);
+        });
       });
     }
+  }
+  @override
+  Widget build(BuildContext context) {
     return AlertDialog(
-      title: title,
+      title: widget.title,
       contentPadding: EdgeInsets.zero,
       actions: <Widget>[
         TextButton(
           child: const Text("取消"),
           onPressed: () {
-            if (onCancel != null) {
-              onCancel!().then((value) {
-                if (value) {
-                  Navigator.of(context).pop(true);
-                }
-              });
-            } else {
-              Navigator.of(context).pop(true);
-            }
+            Navigator.of(context).pop(false);
           },
         ),
       ],
@@ -108,7 +91,7 @@ class _DialogInfoWidget extends StatelessWidget {
         height: 200,
         child: Column(
           children: [
-            Padding(padding: const EdgeInsets.fromLTRB(0, 40, 0, 0), child: ExLoading(title: tip, loadingTitleController: loadingTitleController)),
+            Padding(padding: const EdgeInsets.fromLTRB(0, 40, 0, 0), child: ExLoading(title: widget.tip, loadingTitleController: widget.loadingTitleController)),
           ],
         ),
       ),
