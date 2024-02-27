@@ -19,7 +19,7 @@ Future<bool?> exShowDialogLoading(
     FutureBoolCallback? onClose,
     FutureValueCallback? onLoadingData,
     VoidValueCallback? onFinish,
-      VoidCallback? onCancel,
+    VoidCallback? onCancel,
     VoidCallback? onSucceed,
     Widget? title,
     String? tip,
@@ -69,11 +69,14 @@ class _DialogInfoState extends State<_DialogInfoWidget> {
     if (widget.onLoading != null) {
       Future.delayed(const Duration(microseconds: 5)).then((value) {
         widget.onLoading!().then((value) {
-          Navigator.of(context).pop(value);
+          if (value) {
+            Navigator.of(context).pop(value);
+          }
         });
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(

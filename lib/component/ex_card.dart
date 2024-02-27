@@ -117,7 +117,7 @@ class ExCard extends StatelessWidget {
         height: 50,
         padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
         child: footer,
-      )!);
+      ));
     }
     return Align(
       alignment: Alignment.center,

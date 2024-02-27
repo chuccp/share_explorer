@@ -137,31 +137,34 @@ class UserOperate {
     exShowDialogLoading(
         title: const Text("证书上传中"),
         context: context,
-        onFinish: (value) {
-          if (value.isOK()) {
-            exShowDialog(
-                context: context,
-                title: const Text("上传成功"),
-                onPressed: () {
-                  GoRouter.of(context).replace("/clientLogin");
-                  return Future(() => true);
-                });
-          } else {
-            alertDialog(context: context, msg: value.error!);
-          }
-        },
-        onLoadingData: () {
+        onFinish: (value) {},
+        onLoading: () {
           PlatformFile? platformFile = pickerResult?.files.first;
           if (platformFile != null) {
             final formData = dio.FormData.fromMap({'code': code, 'cert': dio.MultipartFile.fromStream(() => platformFile.readStream!, platformFile.size, filename: platformFile.name)});
             var url = "${HttpClient.getBaseUrl()}user/uploadUserCert";
             return HttpClient.postFile(url, data: formData, onSendProgress: progressCallback).then((response) => response.data).then((data) => Response.fromJson(data)).then((value) {
-              return value;
+              return value.isOK();
             });
           } else {
             return Future.value(false);
           }
+        }).then((value) {
+      if (value != null && value) {
+        exShowDialog(
+            context: context,
+            title: const Text("上传成功"),
+            onPressed: () {
+              return Future(() => true);
+            }).then((value) {
+          if (value != null && value) {
+            GoRouter.of(context).replace("/clientLogin");
+          }
         });
+      } else {
+        alertDialog(context: context, msg: "上传失败");
+      }
+    });
   }
 
   static Future<Response> addUser({required String username, required String password, required String pathIds}) async {
@@ -208,9 +211,9 @@ class UserOperate {
     return res;
   }
 
-  static Future<Response> signIn({required String username, required String password,  String? code,required bool start}) async {
+  static Future<Response> signIn({required String username, required String password, String? code, required bool start}) async {
     var url = "${HttpClient.getBaseUrl()}user/signIn";
-    var response = await HttpClient.postJson(url, body: {"username": username, "password": password}, queryParameters: {"username": username,"code": code, "start": start});
+    var response = await HttpClient.postJson(url, body: {"username": username, "password": password}, queryParameters: {"username": username, "code": code, "start": start});
     var data = response.data;
     var res = Response.fromJson(data);
     return res;

@@ -35,6 +35,8 @@ class HttpClient {
   }
 
   static Future<Response<dynamic>> postFile(String url, {Map<String, dynamic>? queryParameters, required Object? data, dio.ProgressCallback? onSendProgress}) async {
-    return await httpClient.post(url, data: data, options: Options(headers: {"Content-Type": "multipart/form-data"}), queryParameters: queryParameters, onSendProgress: onSendProgress);
+    var options = await getOptions();
+    options.headers?["Content-Type"] = "multipart/form-data";
+    return await httpClient.post(url, data: data, options: options, queryParameters: queryParameters, onSendProgress: onSendProgress);
   }
 }
