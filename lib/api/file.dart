@@ -4,12 +4,14 @@ import 'package:async/async.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:flutter/foundation.dart';
 import '../entry/file.dart';
 import '../entry/token.dart';
 import '../util/download.dart';
 import '../util/http_client.dart';
 import '../util/local_store.dart';
 import '../util/stream.dart';
+import '../entry/response.dart' as resp;
 
 class FileOperate {
   static Future<List<FileItem>> rootListSync() async {
@@ -38,7 +40,8 @@ class FileOperate {
 
   static void download({required String rootPath, required String path_}) async {
     ExToken? token = await LocalStore.getToken();
-    var url = "${HttpClient.getBaseUrl()}file/download?Path=${Uri.encodeComponent(path_)}&RootPath=${Uri.encodeComponent(rootPath)}&username=${Uri.encodeComponent(token!.username!)}&code=${Uri.encodeComponent(token!.code!)}&Token=${Uri.encodeComponent(token!.token!)}";
+    var url =
+        "${HttpClient.getBaseUrl()}file/download?Path=${Uri.encodeComponent(path_)}&RootPath=${Uri.encodeComponent(rootPath)}&username=${Uri.encodeComponent(token!.username!)}&code=${Uri.encodeComponent(token!.code!)}&Token=${Uri.encodeComponent(token!.token!)}";
     downloadUrl(url);
   }
 
@@ -52,14 +55,30 @@ class FileOperate {
       for (var index = 0; index < sizeList.length; index++) {
         progressCallback(uploadNum, platformFile.size);
         var size = sizeList.elementAt(index);
+        if (kDebugMode) {
+          print("11111111");
+        }
         var stream = chunkedStreamReader.readStream(size);
+
+        if (kDebugMode) {
+          print("2222222");
+        }
+
         var response = await HttpClient.postFile(url,
-            data: limitStream(stream),
+            data: stream,
             queryParameters: {"seq": index, "size": size, "total": platformFile.size, "count": sizeList.length, "path": path, "rootPath": rootPath, "name": platformFile.name});
         if (response.statusCode != 200) {
           return Future.value(false);
+        } else {
+          var res = resp.Response.fromJson(response.data);
+          if (!res.isOK()) {
+            return Future.value(false);
+          }
         }
         uploadNum = uploadNum + size;
+        if (kDebugMode) {
+          print("3333333");
+        }
       }
       progressCallback(uploadNum, platformFile.size);
       return Future.value(true);

@@ -1,6 +1,9 @@
+
+import 'package:dio/src/response.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_explorer/entry/message.dart';
 import 'package:share_explorer/entry/response.dart';
 
 import '../api/user.dart';
@@ -12,6 +15,7 @@ import '../component/ex_load.dart';
 import '../component/ex_login.dart';
 import '../entry/info.dart';
 import '../util/local_store.dart';
+import '../entry/response.dart' as resp;
 
 class ClientLoginPage extends StatefulWidget {
   const ClientLoginPage({super.key});
@@ -55,7 +59,7 @@ class _UserLogin {
     _isCancel = true;
   }
 
-  Future<Response> _userLogin({required String username, required String password, required String code, required bool start}) {
+  Future<resp.Response> _userLogin({required String username, required String password, required String code, required bool start}) {
     return UserOperate.signIn(username: username, password: password, start: start, code: code);
   }
 }

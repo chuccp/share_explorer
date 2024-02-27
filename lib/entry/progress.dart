@@ -167,7 +167,7 @@ class Progress {
       var size = sizeList!.elementAt(index);
       var stream = chunkedStreamReader!.readStream(size);
       var response = await HttpClient.postFile(url!,
-          data: limitStream(stream), queryParameters: {"seq": index, "size": size, "total": total, "count": sizeList!.length, "path": path, "rootPath": rootPath, "name": name});
+          data: stream, queryParameters: {"seq": index, "size": size, "total": total, "count": sizeList!.length, "path": path, "rootPath": rootPath, "name": name});
       if (response.statusCode != 200) {
         return Future.value(false);
       }

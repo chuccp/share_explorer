@@ -25,11 +25,16 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class LoadPage extends StatelessWidget {
+class LoadPage extends StatefulWidget {
   const LoadPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<StatefulWidget> createState() => _LoadPageState();
+}
+
+class _LoadPageState extends State<LoadPage> {
+  @override
+  void initState() {
     UserOperate.info().then((value) {
       ExCache.saveInfoItem(value);
       if (value.hasInit!) {
@@ -46,12 +51,17 @@ class LoadPage extends StatelessWidget {
         GoRouter.of(context).replace("/choose");
       }
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ExLoading();
   }
 }
 
 class ChoosePage extends StatelessWidget {
   const ChoosePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     ExRadioEditingController exRadioEditingController = ExRadioEditingController(values: [ExRadioValue(label: '服务器模式', value: 'server'), ExRadioValue(label: '客户端模式', value: 'client')]);

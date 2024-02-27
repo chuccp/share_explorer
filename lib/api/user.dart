@@ -8,6 +8,7 @@ import 'package:share_explorer/component/ex_dialog_loading.dart';
 import '../component/ex_dialog.dart';
 import '../component/ex_load.dart';
 import '../entry/info.dart';
+import '../entry/message.dart';
 import '../entry/page.dart';
 import '../entry/path.dart';
 import '../entry/response.dart';
@@ -16,6 +17,7 @@ import '../entry/user.dart';
 import '../util/download.dart';
 import '../util/http_client.dart';
 import '../util/local_store.dart';
+import '../entry/response.dart' as resp;
 
 class UserOperate {
   static Future<InfoItem> info() async {
@@ -213,10 +215,14 @@ class UserOperate {
 
   static Future<Response> signIn({required String username, required String password, String? code, required bool start}) async {
     var url = "${HttpClient.getBaseUrl()}user/signIn";
-    var response = await HttpClient.postJson(url, body: {"username": username, "password": password}, queryParameters: {"username": username, "code": code, "start": start});
-    var data = response.data;
-    var res = Response.fromJson(data);
-    return res;
+    var resp = await HttpClient.postJson(url, body: {"username": username, "password": password}, queryParameters: {"username": username, "code": code, "start": start});
+    if (resp.statusCode == 200) {
+      var data = resp.data;
+      var res = Response.fromJson(data);
+      return res;
+    } else {
+      return Response(code: resp.statusCode, error: "系统错误");
+    }
   }
 
   static Future<void> downloadCert() async {

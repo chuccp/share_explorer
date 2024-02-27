@@ -1,9 +1,12 @@
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:share_explorer/entry/message.dart';
 import 'package:share_explorer/entry/token.dart';
 
 import 'local_store.dart';
+import '../entry/response.dart' as resp;
 
 class HttpClient {
   static final httpClient = dio.Dio();
@@ -14,6 +17,26 @@ class HttpClient {
 
   static Future<Response<dynamic>> postJson(String url, {Object? body, Map<String, dynamic>? queryParameters}) async {
     return await httpClient.post(url, data: body, queryParameters: queryParameters, options: await getOptions());
+  }
+
+  static Future<Message> postJsonForMessage(String url, {Object? body, Map<String, dynamic>? queryParameters}) async {
+    var response = await postJson(url, queryParameters: queryParameters, body: body);
+    if (response.statusCode != 200) {
+      return Message(ok: false, msg: "系统异常");
+    } else {
+      var rs = resp.Response.fromJson(response.data);
+      if (!rs.isOK()) {
+        return Message(ok: false, msg: rs.error!);
+      }
+      return Message(ok: true, msg: rs.data);
+    }
+  }
+
+  static Future<Message> postJsonForMessageAndDialog( BuildContext context,String url, {Object? body, Map<String, dynamic>? queryParameters}) {
+    return  postJsonForMessage(url, queryParameters: queryParameters, body: body).then((value){
+
+       return value;
+     });
   }
 
   static Future<Options> getOptions() async {
