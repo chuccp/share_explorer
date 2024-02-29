@@ -169,13 +169,10 @@ class UserOperate {
     });
   }
 
-  static Future<Response> addUser({required String username, required String password, required String pathIds}) async {
+  static Future<Message> addUser(BuildContext context, {required String username, required String password, required String pathIds}) {
     var postData = {"username": username, "password": password, "pathIds": pathIds};
     var url = "${HttpClient.getBaseUrl()}user/addUser";
-    var response = await HttpClient.postJson(url, body: postData);
-    var data = response.data;
-    var res = Response.fromJson(data);
-    return res;
+    return HttpClient.postJsonForMessageAndDialog(context, url, body: postData);
   }
 
   static Future<Response> editUser({required int id, required String username, required String password, required String pathIds}) async {

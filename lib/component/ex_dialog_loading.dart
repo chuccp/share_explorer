@@ -74,6 +74,12 @@ class _DialogInfoState extends State<_DialogInfoWidget> {
           }
         });
       });
+    } else if (widget.onLoadingData != null) {
+      widget.onLoadingData!().then((value) {
+        if (widget.onFinish != null) {
+          widget.onFinish!(value);
+        }
+      });
     }
   }
 

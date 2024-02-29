@@ -55,8 +55,8 @@ class _UserListState extends State<UserList> {
               exCheckboxController: exCheckboxController,
             ),
             onPressed: () {
-              return UserOperate.addUser(username: usernameController.text, password: passwordController.text, pathIds: exCheckboxController.selectIds).then((value) {
-                if (value.isOK()) {
+              return UserOperate.addUser(context,username: usernameController.text, password: passwordController.text, pathIds: exCheckboxController.selectIds).then((value) {
+                if (value.ok) {
                   query(pageNo);
                   return true;
                 } else {
