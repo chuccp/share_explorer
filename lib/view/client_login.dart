@@ -27,30 +27,30 @@ class ClientLoginPage extends StatefulWidget {
 class _UserLogin {
   bool _isCancel = false;
 
-  Future<bool> userLogin({required TextController loadingTitleController, required String username, required String password, required String code, required bool start}) {
+  Future<bool> userLogin(BuildContext context,{required TextController loadingTitleController, required String username, required String password, required String code, required bool start}) {
     if (_isCancel) {
       return Future.value(false);
     }
-    return _userLogin(username: username, password: password, code: code, start: start).then((value) {
+    return _userLogin(context,username: username, password: password, code: code, start: start).then((value) {
       if (_isCancel) {
         return false;
       }
-      if (value.code == 200) {
+      if (value.code==200) {
         _isCancel = true;
-        return LocalStore.saveToken(token: value.data, code: code, username: username, expires: const Duration(days: 1)).then((va) {
+        return LocalStore.saveToken(token: value.msg, code: code, username: username, expires: const Duration(days: 1)).then((va) {
           return true;
         });
-      } else if (value.code == 500) {
-        _isCancel = true;
-        loadingTitleController.value = value.error!;
-        return false;
-      } else {
+      } else if (value.code == 203) {
         return Future.delayed(const Duration(seconds: 5)).then((value) {
           if (_isCancel) {
             return false;
           }
-          return userLogin(loadingTitleController: loadingTitleController, username: username, password: password, code: code, start: false);
+          return userLogin(context,loadingTitleController: loadingTitleController, username: username, password: password, code: code, start: false);
         });
+      } else {
+        _isCancel = true;
+        loadingTitleController.value = value.msg;
+        return false;
       }
     });
   }
@@ -59,8 +59,8 @@ class _UserLogin {
     _isCancel = true;
   }
 
-  Future<resp.Response> _userLogin({required String username, required String password, required String code, required bool start}) {
-    return UserOperate.signIn(username: username, password: password, start: start, code: code);
+  Future<Message> _userLogin(BuildContext context,{required String username, required String password, required String code, required bool start}) {
+    return UserOperate.signIn(context,username: username, password: password, start: start, code: code);
   }
 }
 
@@ -100,7 +100,7 @@ class _ClientLoginState extends State<ClientLoginPage> {
                   onLoading: () {
                     userLogin.cancel();
                     userLogin = _UserLogin();
-                    return userLogin.userLogin(
+                    return userLogin.userLogin(context,
                         loadingTitleController: loadingTitleController, username: exLoginController.username, password: exLoginController.password, code: exLoginController.code, start: true);
                   },
                 ).then((value) {

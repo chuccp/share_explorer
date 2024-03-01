@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../entry/file.dart';
+import 'ex_right_context_menu.dart';
 
 class FileIconButton extends TextButton {
   FileIconButton({
@@ -37,19 +38,27 @@ class FileIconButton extends TextButton {
     if (!fileItem.isDir!) {
       iconData = Icons.file_copy;
     }
+
+    Widget child = Padding(
+        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+        child: Icon(
+          color: Colors.amberAccent,
+          iconData,
+          size: 50,
+        ));
+    if (!fileItem.isDir!) {
+      child = ExRightContextMenu(
+        menuChildren: [ContextMenuButtonConfig(label: "下载"), ContextMenuButtonConfig(label: "删除")],
+        child: child,
+      );
+    }
     String? title = fileItem.name;
     return FileIconButton(
         autofocus: autofocus,
         focusNode: focusNode,
         onDoubleTap: onDoubleTap,
         onTap: onPressed,
-        icon: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-            child: Icon(
-              color: Colors.amberAccent,
-              iconData,
-              size: 50,
-            )),
+        icon: child,
         label: Text(title!, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(color: Colors.black54, fontSize: 12.0)));
   }
 }

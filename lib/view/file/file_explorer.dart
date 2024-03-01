@@ -1,9 +1,11 @@
 import 'dart:collection';
+
 import 'package:context_menus/context_menus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_explorer/component/ex_path_button.dart';
+import 'package:share_explorer/component/ex_right_context_menu.dart' as right_context_menu;
 import '../../api/file.dart';
 import '../../component/ex_button_group.dart';
 import '../../component/ex_file_process.dart';
@@ -362,6 +364,12 @@ class _FileListView extends StatefulWidget {
 }
 
 class _FileListViewState extends State<_FileListView> {
+
+  @override
+  void initState() {
+
+  }
+
   @override
   Widget build(BuildContext context) {
     var items = Provider.of<FilePageDelegate>(context).fileItems;
@@ -374,54 +382,38 @@ class _FileListViewState extends State<_FileListView> {
     }
     final List<Widget> children = <Widget>[
       for (int i = 0; i < items.length; i++)
-        ContextMenuRegion(
-          contextMenu: GenericContextMenu(
-            buttonConfigs: [
-              ContextMenuButtonConfig(
-                "删除",
-                onPressed: () {
-                  print(items[i].name);
-                },
-              ),
-              ContextMenuButtonConfig(
-                "重命名",
-                onPressed: () {
-                  print(items[i].name);
-                },
-              ),
-            ],
-          ),
-          child: FileIconButton.fileItem(
-            fileItem: items[i],
-            focusNode: focusNodes.elementAt(i),
-            onPressed: () => {focusNodes.elementAt(i).requestFocus()},
-            onDoubleTap: () {
-              if (items[i].isDir!) {
-                loadFileAsset(context: context, rootPath: widget.rootPath, path: items[i].path!, isArrow: false);
-              } else {
-                Future.delayed(const Duration(milliseconds: 100)).then((value) {
-                  FileOperate.download(rootPath: widget.rootPath, path_: items[i].path!);
-                });
-                Provider.of<FilePageDelegate>(context, listen: false).unFocusNodes();
-              }
-            },
-          ),
+        FileIconButton.fileItem(
+          fileItem: items[i],
+          focusNode: focusNodes.elementAt(i),
+          onPressed: () => {focusNodes.elementAt(i).requestFocus()},
+          onDoubleTap: () {
+            if (items[i].isDir!) {
+              loadFileAsset(context: context, rootPath: widget.rootPath, path: items[i].path!, isArrow: false);
+            } else {
+              Future.delayed(const Duration(milliseconds: 100)).then((value) {
+                FileOperate.download(rootPath: widget.rootPath, path_: items[i].path!);
+              });
+              Provider.of<FilePageDelegate>(context, listen: false).unFocusNodes();
+            }
+          },
         )
+        // right_context_menu.ExRightContextMenu(menuChildren: [ right_context_menu.ContextMenuButtonConfig(label: "下载"),right_context_menu.ContextMenuButtonConfig(label: "删除")],
+        // child: )
     ];
 
     return Container(
         padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
         child: GestureDetector(
           onTap: () => {},
-          child: ContextMenuOverlay(
-            child: GridView.extent(
-              padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-              maxCrossAxisExtent: 120.0,
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 5,
-              children: children,
-            ),
+          child: GridView.extent(
+            padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+            maxCrossAxisExtent: 120.0,
+            crossAxisSpacing: 5,
+            mainAxisSpacing: 5,
+            children: children,
           ),
         ));
   }
+
+
 }

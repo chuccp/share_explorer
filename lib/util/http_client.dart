@@ -22,14 +22,14 @@ class HttpClient {
 
   static Future<Message> postJsonForMessage(String url, {Object? body, Map<String, dynamic>? queryParameters}) async {
     var response = await postJson(url, queryParameters: queryParameters, body: body);
-    if (response.statusCode != 200 && response.statusCode != 203) {
-      return Message(ok: false, msg: "系统异常");
+    if (response.statusCode != 200) {
+      return Message(ok: false, msg: "系统异常",code: response.statusCode!);
     } else {
       var rs = resp.Response.fromJson(response.data);
-      if (!rs.isOK()) {
-        return Message(ok: false, msg: rs.error!);
+      if (rs.code==200 || rs.code==203) {
+        return Message(ok: true, msg: rs.error!,code:rs.code!,data: rs.data );
       }
-      return Message(ok: true, msg: rs.data);
+      return Message(ok: false, msg: rs.data,code:rs.code!);
     }
   }
 

@@ -210,16 +210,10 @@ class UserOperate {
     return res;
   }
 
-  static Future<Response> signIn({required String username, required String password, String? code, required bool start}) async {
+  static Future<Message> signIn(BuildContext context,{required String username, required String password, String? code, required bool start})  {
     var url = "${HttpClient.getBaseUrl()}user/signIn";
-    var resp = await HttpClient.postJson(url, body: {"username": username, "password": password}, queryParameters: {"username": username, "code": code, "start": start});
-    if (resp.statusCode == 200) {
-      var data = resp.data;
-      var res = Response.fromJson(data);
-      return res;
-    } else {
-      return Response(code: resp.statusCode, error: "系统错误");
-    }
+    return HttpClient.postJsonForMessageAndDialog(context,url, body: {"username": username, "password": password}, queryParameters: {"username": username, "code": code, "start": start});
+
   }
 
   static Future<void> downloadCert() async {
