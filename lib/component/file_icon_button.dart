@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../entry/file.dart';
 import 'ex_right_context_menu.dart';
-
+//ExRightContextMenu(
+//         menuChildren: [ContextMenuButtonConfig(label: "下载"), ContextMenuButtonConfig(label: "删除")],
+//         child: child,
+//       )
 class FileIconButton extends TextButton {
   FileIconButton({
     super.key,
@@ -38,27 +41,19 @@ class FileIconButton extends TextButton {
     if (!fileItem.isDir!) {
       iconData = Icons.file_copy;
     }
-
-    Widget child = Padding(
-        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-        child: Icon(
-          color: Colors.amberAccent,
-          iconData,
-          size: 50,
-        ));
-    if (!fileItem.isDir!) {
-      child = ExRightContextMenu(
-        menuChildren: [ContextMenuButtonConfig(label: "下载"), ContextMenuButtonConfig(label: "删除")],
-        child: child,
-      );
-    }
     String? title = fileItem.name;
     return FileIconButton(
         autofocus: autofocus,
         focusNode: focusNode,
         onDoubleTap: onDoubleTap,
         onTap: onPressed,
-        icon: child,
+        icon: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+            child: Icon(
+              color: Colors.amberAccent,
+              iconData,
+              size: 50,
+            )),
         label: Text(title!, maxLines: 1, textAlign: TextAlign.center, style: const TextStyle(color: Colors.black54, fontSize: 12.0)));
   }
 }
@@ -82,7 +77,8 @@ class _FileIconButtonChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
+    return ExRightContextMenu(menuChildren:  [ContextMenuButtonConfig(label: "下载"), ContextMenuButtonConfig(label: "删除")],
+    child: LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return InkWell(
           onDoubleTap: onDoubleTap,
@@ -98,6 +94,6 @@ class _FileIconButtonChild extends StatelessWidget {
               )),
         );
       },
-    );
+    ),);
   }
 }

@@ -406,7 +406,7 @@ class _FileListViewState extends State<_FileListView> {
         child: GestureDetector(
           onTap: () => {},
           child: GridView.extent(
-            padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             maxCrossAxisExtent: 120.0,
             crossAxisSpacing: 5,
             mainAxisSpacing: 5,
