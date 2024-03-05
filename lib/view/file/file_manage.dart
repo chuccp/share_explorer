@@ -54,7 +54,6 @@ class _FileManagePageState extends State<FileManagePage> {
   @override
   Widget build(BuildContext context) {
     var titles = [for (var ex in exPaths) ex.name!];
-
     return Material(
         borderOnForeground: false,
         color: Colors.white,

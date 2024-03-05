@@ -1,5 +1,4 @@
 
-import 'package:dio/src/response.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -68,9 +67,9 @@ class _ClientLoginState extends State<ClientLoginPage> {
   @override
   Widget build(BuildContext context) {
     ExLoginController exLoginController = ExLoginController();
-    exLoginController.username = "111111";
-    exLoginController.code = "111111";
-    exLoginController.password = "111111";
+    // exLoginController.username = "111111";
+    // exLoginController.code = "111111";
+    // exLoginController.password = "111111";
     var userLogin = _UserLogin();
     return ExCardLayout(
       child: ExCard(

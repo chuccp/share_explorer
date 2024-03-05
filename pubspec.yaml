@@ -73,6 +73,20 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   generate: true
+  fonts:
+    - family: Noto Sans SC
+      fonts:
+        - asset: fonts/Noto-Sans-SC.ttf
+    - family: Noto Color Emoji
+      fonts:
+        - asset: fonts/Noto-Color-Emoji.ttf
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto.ttf
+    - family: Noto Sans Symbols 2
+      fonts:
+        - asset: fonts/Noto-Sans-Symbols-2.ttf
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -101,6 +115,7 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

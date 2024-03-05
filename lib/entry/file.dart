@@ -10,6 +10,14 @@ class FileItem {
   int? size;
   DateTime? modifyTime;
 
+  bool hasChild() {
+    if (isDisk! || isDir!) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   factory FileItem.fromJson(Map<String, dynamic> json) {
     DateTime modify = DateTime.now();
     if (json.containsKey('modifyTime')) {
