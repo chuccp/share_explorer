@@ -1,5 +1,5 @@
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:share_explorer/component/ex_file_browse.dart';
 import 'package:share_explorer/component/ex_file_operate.dart';
 import 'package:share_explorer/component/ex_file_path.dart';
@@ -39,20 +39,20 @@ class FileExplorer extends StatefulWidget {
   State<StatefulWidget> createState() => _FileExplorerState();
 }
 
-class _uploadFilePath {
-  const _uploadFilePath(this.success, this.rootPath, this.path);
+class _UploadFilePath {
+  const _UploadFilePath(this.success, this.rootPath, this.path);
 
   final bool success;
   final String rootPath;
   final String path;
 }
 
-Future<_uploadFilePath> _uploadFile(BuildContext context, String rootPath, String path, ExTransformController exTransformController, FilePickerResult? pickerResult) {
+Future<_UploadFilePath> _uploadFile(BuildContext context, String rootPath, String path, ExTransformController exTransformController, FilePickerResult? pickerResult) {
   var id = DateTime.timestamp().millisecond;
   String? name = pickerResult?.names.first;
   var progress = Progress(pickerResult!, id: "$id", name: name, total: pickerResult.files.first.size);
   exTransformController.add(progress);
-  return progress.exec(path, rootPath).then((value) => _uploadFilePath(value, rootPath, path));
+  return progress.exec(path, rootPath).then((value) => _UploadFilePath(value, rootPath, path));
 }
 
 class _FileExplorerState extends State<FileExplorer> {
@@ -94,7 +94,48 @@ class _FileExplorerState extends State<FileExplorer> {
                     }
                   });
                 },
-                onCreateNewFile: () {},
+                onCreateNewFile: () {
+                  TextEditingController unameController = TextEditingController();
+                  showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context2) => AlertDialog(
+                              title: const Text('新建文件夹'),
+                              content: TextField(
+                                autofocus: true,
+                                controller: unameController,
+                                decoration: const InputDecoration(hintText: "文件名", prefixIcon: Icon(Icons.folder)),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context2).pop(false);
+                                  },
+                                  child: const Text('取消'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    FileOperate.createNewFolder(rootPath: filePathController.value.rootPath, path: filePathController.value.path, folder: unameController.text).then((value) {
+                                      if (value) {
+                                        Navigator.of(context2).pop(true);
+                                      }
+                                    });
+
+                                    // if (unameController.text.isNotEmpty) {
+                                    //   unameController.clear();
+                                    // }
+
+                                    // Navigator.of(context).pop(true);
+                                  },
+                                  child: const Text('确认'),
+                                ),
+                              ])).then((value){
+
+                                if(value!){
+                                  load(filePathController, exFileBrowseController, exFilePathController);
+                                }
+
+                  });
+                },
                 onRefresh: () {
                   load(filePathController, exFileBrowseController, exFilePathController);
                 },
