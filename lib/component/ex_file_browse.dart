@@ -18,12 +18,20 @@ class ExFileBrowseController extends ValueNotifier<List<FileItem>> {
     super.value = value;
   }
 
-  bool get load=>_isLoad_;
+  bool get load => _isLoad_;
 
   set load(bool isLoad) {
     _isLoad_ = isLoad;
     notifyListeners();
   }
+
+  String _path_ = "";
+
+  set path(String path) {
+    _path_ = path;
+  }
+
+  String get path => _path_;
 }
 
 class ExFileBrowse extends StatefulWidget {

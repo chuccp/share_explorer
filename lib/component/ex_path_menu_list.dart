@@ -48,9 +48,9 @@ class ExPathMenuList extends StatelessWidget {
 
   final LoadFileItemListCallback loadFileItemList;
 
-  void refresh(ExFileBrowseController exFileBrowseController, String path) {
+  void refresh(ExFileBrowseController exFileBrowseController) {
     exFileBrowseController.load = true;
-    loadFileItemList(exPathMenuController.selectExPath.path!, path).then((value) {
+    loadFileItemList(exPathMenuController.selectExPath.path!, exFileBrowseController.path).then((value) {
       exFileBrowseController.value = value;
     });
   }
@@ -68,7 +68,6 @@ class ExPathMenuList extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: exPathMenuController,
       builder: (BuildContext context, value, Widget? child) {
-        String path_ = "\\";
         ExFileBrowseController exFileBrowseController = ExFileBrowseController();
         var titles = [for (var ex in exPathMenuController.value) ex.name!];
         return Material(
@@ -132,9 +131,9 @@ class ExPathMenuList extends StatelessWidget {
                                 Future<FilePickerResult?> result = FilePicker.platform.pickFiles(withReadStream: true);
                                 result.then((value) {
                                   if (value != null) {
-                                    _uploadFile(context, exPathMenuController.selectExPath.path!, path_, exTransformController, value).then((value) {
+                                    _uploadFile(context, exPathMenuController.selectExPath.path!, exFileBrowseController.path,exTransformController, value).then((value) {
                                       if (value.success) {
-                                        refresh(exFileBrowseController, path_);
+                                        refresh(exFileBrowseController);
                                       }
                                     });
                                   }
@@ -160,7 +159,7 @@ class ExPathMenuList extends StatelessWidget {
                                               ),
                                               TextButton(
                                                 onPressed: () {
-                                                  FileOperate.createNewFolder(rootPath: exPathMenuController.selectExPath.path!, path: path_, folder: unameController.text).then((value) {
+                                                  FileOperate.createNewFolder(rootPath: exPathMenuController.selectExPath.path!, path: exFileBrowseController.path, folder: unameController.text).then((value) {
                                                     if (value) {
                                                       Navigator.of(context2).pop(true);
                                                     }
@@ -170,12 +169,12 @@ class ExPathMenuList extends StatelessWidget {
                                               ),
                                             ])).then((value) {
                                   if (value!) {
-                                    refresh(exFileBrowseController, path_);
+                                    refresh(exFileBrowseController);
                                   }
                                 });
                               },
                               onRefresh: () {
-                                refresh(exFileBrowseController, path_);
+                                refresh(exFileBrowseController);
                               }),
                           Expanded(child: Builder(
                             builder: (BuildContext context) {
@@ -184,7 +183,6 @@ class ExPathMenuList extends StatelessWidget {
                                   exPath: exPathMenuController.selectExPath,
                                   loadFileItemListCallback: (String rootPath, String path) {
                                     return loadFileItemList(rootPath, path).then((value) {
-                                      path_ = path;
                                       return value;
                                     });
                                   },

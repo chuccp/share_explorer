@@ -48,21 +48,9 @@ class FileExplorer extends StatefulWidget {
   State<StatefulWidget> createState() => _FileExplorerState();
 }
 
-class _UploadFilePath {
-  const _UploadFilePath(this.success, this.rootPath, this.path);
 
-  final bool success;
-  final String rootPath;
-  final String path;
-}
 
-Future<_UploadFilePath> _uploadFile(BuildContext context, String rootPath, String path, ExTransformController exTransformController, FilePickerResult? pickerResult) {
-  var id = DateTime.timestamp().millisecond;
-  String? name = pickerResult?.names.first;
-  var progress = Progress(pickerResult!, id: "$id", name: name, total: pickerResult.files.first.size);
-  exTransformController.add(progress);
-  return progress.exec(path, rootPath).then((value) => _UploadFilePath(value, rootPath, path));
-}
+
 
 class _FileExplorerState extends State<FileExplorer> {
   void load(FilePathController filePathController, ExFileBrowseController exFileBrowseController, ExFilePathController exFilePathController) {
@@ -70,6 +58,7 @@ class _FileExplorerState extends State<FileExplorer> {
     exFilePathController.value = filePathController.value.path;
     widget.loadFileItemListCallback(filePathController.value.rootPath,  filePathController.value.path).then((value) {
       exFileBrowseController.value = value;
+      exFileBrowseController.path = filePathController.value.path;
     });
   }
 
@@ -89,6 +78,7 @@ class _FileExplorerState extends State<FileExplorer> {
             ExFilePath(
                 onPressed: (path) {
                   filePathController.path = path;
+                  exFileBrowseController.path = path;
                   if (widget.onPathChanged != null) {
                     widget.onPathChanged!(path);
                   }
@@ -101,6 +91,7 @@ class _FileExplorerState extends State<FileExplorer> {
                   onDoubleTap: (item) {
                     if (item.hasChild()) {
                       filePathController.path = item.path!;
+                      exFileBrowseController.path = item.path!;
                       if (widget.onPathChanged != null) {
                         widget.onPathChanged!(item.path!);
                       }
