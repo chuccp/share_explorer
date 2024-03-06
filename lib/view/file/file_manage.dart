@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_explorer/api/user.dart';
 import 'package:share_explorer/entry/file.dart';
 
@@ -18,20 +19,35 @@ class _FileManagePageState extends State<FileManagePage> {
     return FileOperate.listSync(rootPath: rootPath, path_: path);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    ExPathMenuController exPathMenuController = ExPathMenuController();
-    ExTransformController exTransformController = ExTransformController();
+  ExPathMenuController exPathMenuController = ExPathMenuController();
+  ExTransformController exTransformController = ExTransformController();
+
+  void _queryAll() {
     UserOperate.queryAllPath().then((value) {
-      if (value.data != null && value.data!.list != null) {
+      if (value.data != null) {
         exPathMenuController.value = value.data!.list!;
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _queryAll();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ExPathMenuList(
       exPathMenuController: exPathMenuController,
       exTransformController: exTransformController,
       loadFileItemList: (String rootPath, String path) {
         return loadFileItemList(rootPath, path);
+      },
+      onPressSetting: () {
+        GoRouter.of(context).push("/fileSetting").then((value) {
+          _queryAll();
+        });
       },
     );
   }

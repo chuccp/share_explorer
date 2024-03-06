@@ -40,13 +40,15 @@ class _UploadFilePath {
 }
 
 class ExPathMenuList extends StatelessWidget {
-  const ExPathMenuList({super.key, required this.exPathMenuController, required this.exTransformController, required this.loadFileItemList});
+  const ExPathMenuList({super.key, required this.exPathMenuController, required this.exTransformController, required this.loadFileItemList, required this.onPressSetting});
 
   final ExPathMenuController exPathMenuController;
 
   final ExTransformController exTransformController;
 
   final LoadFileItemListCallback loadFileItemList;
+
+  final VoidCallback  onPressSetting;
 
   void refresh(ExFileBrowseController exFileBrowseController) {
     exFileBrowseController.load = true;
@@ -115,7 +117,7 @@ class ExPathMenuList extends StatelessWidget {
                               child: IconButton(
                                 splashRadius: 20,
                                 icon: const Icon(Icons.settings),
-                                onPressed: () {},
+                                onPressed: onPressSetting,
                               ))
                         ],
                       ),
@@ -131,7 +133,7 @@ class ExPathMenuList extends StatelessWidget {
                                 Future<FilePickerResult?> result = FilePicker.platform.pickFiles(withReadStream: true);
                                 result.then((value) {
                                   if (value != null) {
-                                    _uploadFile(context, exPathMenuController.selectExPath.path!, exFileBrowseController.path,exTransformController, value).then((value) {
+                                    _uploadFile(context, exPathMenuController.selectExPath.path!, exFileBrowseController.path, exTransformController, value).then((value) {
                                       if (value.success) {
                                         refresh(exFileBrowseController);
                                       }
@@ -159,7 +161,8 @@ class ExPathMenuList extends StatelessWidget {
                                               ),
                                               TextButton(
                                                 onPressed: () {
-                                                  FileOperate.createNewFolder(rootPath: exPathMenuController.selectExPath.path!, path: exFileBrowseController.path, folder: unameController.text).then((value) {
+                                                  FileOperate.createNewFolder(rootPath: exPathMenuController.selectExPath.path!, path: exFileBrowseController.path, folder: unameController.text)
+                                                      .then((value) {
                                                     if (value) {
                                                       Navigator.of(context2).pop(true);
                                                     }
