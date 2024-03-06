@@ -14,10 +14,11 @@ import 'ex_transformView.dart';
 class ExPathMenuController extends ValueNotifier<List<ExPath>> {
   ExPathMenuController() : super(List.empty());
 
-  int _selectIndex = 0;
+  int _selectIndex = -1;
 
   @override
   set value(List<ExPath> value) {
+    _selectIndex = 0;
     super.value = value;
   }
 
@@ -48,7 +49,7 @@ class ExPathMenuList extends StatelessWidget {
 
   final LoadFileItemListCallback loadFileItemList;
 
-  final VoidCallback  onPressSetting;
+  final VoidCallback onPressSetting;
 
   void refresh(ExFileBrowseController exFileBrowseController) {
     exFileBrowseController.load = true;
@@ -98,7 +99,7 @@ class ExPathMenuList extends StatelessWidget {
                           ),
                           Expanded(
                               child: ExButtonGroup(
-                            selectIndex: 0,
+                            selectIndex: exPathMenuController.selectIndex,
                             titles: titles,
                             indexCallback: (index) {
                               exPathMenuController.selectIndex = index;
@@ -171,7 +172,7 @@ class ExPathMenuList extends StatelessWidget {
                                                 child: const Text('确认'),
                                               ),
                                             ])).then((value) {
-                                  if (value!) {
+                                  if (value != null && value) {
                                     refresh(exFileBrowseController);
                                   }
                                 });
@@ -181,7 +182,7 @@ class ExPathMenuList extends StatelessWidget {
                               }),
                           Expanded(child: Builder(
                             builder: (BuildContext context) {
-                              if (exPathMenuController.selectIndex >= 0 && exPathMenuController.value.isNotEmpty) {
+                              if ( exPathMenuController.value.isNotEmpty) {
                                 return FileExplorer(
                                   exPath: exPathMenuController.selectExPath,
                                   loadFileItemListCallback: (String rootPath, String path) {
