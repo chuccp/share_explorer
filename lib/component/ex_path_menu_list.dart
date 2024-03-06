@@ -99,7 +99,9 @@ class ExPathMenuList extends StatelessWidget {
                               child: ExButtonGroup(
                             selectIndex: 0,
                             titles: titles,
-                            indexCallback: (index) {},
+                            indexCallback: (index) {
+                              exPathMenuController.selectIndex = index;
+                            },
                             emptyTitle: '当前没有设置目录，请在左下角设置',
                           )),
                           const Divider(

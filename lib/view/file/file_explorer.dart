@@ -86,68 +86,6 @@ class _FileExplorerState extends State<FileExplorer> {
         load(filePathController, exFileBrowseController, exFilePathController);
         return Column(
           children: [
-            // ExFileOperate(
-            //   onUpload: () {
-            //     Future<FilePickerResult?> result = FilePicker.platform.pickFiles(withReadStream: true);
-            //     result.then((value) {
-            //       if (value != null) {
-            //         _uploadFile(context, filePathController.value.rootPath, filePathController.value.path, exTransformController, value).then((value) {
-            //           if (value.success) {
-            //             if (filePathController.value.rootPath == value.rootPath && filePathController.value.path == value.path) {
-            //               load(filePathController, exFileBrowseController, exFilePathController);
-            //             }
-            //           }
-            //         });
-            //       }
-            //     });
-            //   },
-            //   onCreateNewFile: () {
-            //     TextEditingController unameController = TextEditingController();
-            //     showDialog<bool>(
-            //         context: context,
-            //         builder: (BuildContext context2) => AlertDialog(
-            //                 title: const Text('新建文件夹'),
-            //                 content: TextField(
-            //                   autofocus: true,
-            //                   controller: unameController,
-            //                   decoration: const InputDecoration(hintText: "文件名", prefixIcon: Icon(Icons.folder)),
-            //                 ),
-            //                 actions: <Widget>[
-            //                   TextButton(
-            //                     onPressed: () {
-            //                       Navigator.of(context2).pop(false);
-            //                     },
-            //                     child: const Text('取消'),
-            //                   ),
-            //                   TextButton(
-            //                     onPressed: () {
-            //                       FileOperate.createNewFolder(rootPath: filePathController.value.rootPath, path: filePathController.value.path, folder: unameController.text).then((value) {
-            //                         if (value) {
-            //                           Navigator.of(context2).pop(true);
-            //                         }
-            //                       });
-            //
-            //                       // if (unameController.text.isNotEmpty) {
-            //                       //   unameController.clear();
-            //                       // }
-            //
-            //                       // Navigator.of(context).pop(true);
-            //                     },
-            //                     child: const Text('确认'),
-            //                   ),
-            //                 ])).then((value){
-            //
-            //                   if(value!){
-            //                     load(filePathController, exFileBrowseController, exFilePathController);
-            //                   }
-            //
-            //     });
-            //   },
-            //   onRefresh: () {
-            //     load(filePathController, exFileBrowseController, exFilePathController);
-            //   },
-            //   exTransformController: exTransformController,
-            // ),
             ExFilePath(
                 onPressed: (path) {
                   filePathController.path = path;
