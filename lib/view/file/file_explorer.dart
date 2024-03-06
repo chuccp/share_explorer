@@ -6,8 +6,11 @@ import 'package:share_explorer/component/ex_file_path.dart';
 
 import '../../api/file.dart';
 import '../../component/ex_transformView.dart';
+import '../../entry/file.dart';
 import '../../entry/path.dart';
 import '../../entry/progress.dart';
+
+typedef LoadFileItemListCallback = Future<List<FileItem>> Function(String rootPath, String path);
 
 class FilePath {
   FilePath({
@@ -31,9 +34,15 @@ class FilePathController extends ValueNotifier<FilePath> {
 }
 
 class FileExplorer extends StatefulWidget {
-  const FileExplorer({super.key, required this.exPath});
+  FileExplorer({super.key, required this.exPath, this.onPathChanged, required this.loadFileItemListCallback, required this.exFileBrowseController});
 
   final ExPath exPath;
+
+  ValueChanged<String>? onPathChanged;
+
+  final LoadFileItemListCallback loadFileItemListCallback;
+
+  final ExFileBrowseController exFileBrowseController;
 
   @override
   State<StatefulWidget> createState() => _FileExplorerState();
@@ -57,14 +66,14 @@ Future<_UploadFilePath> _uploadFile(BuildContext context, String rootPath, Strin
 
 class _FileExplorerState extends State<FileExplorer> {
   void load(FilePathController filePathController, ExFileBrowseController exFileBrowseController, ExFilePathController exFilePathController) {
-    exFileBrowseController.isLoad = true;
+    exFileBrowseController.load = true;
     exFilePathController.value = filePathController.value.path;
-    FileOperate.listSync(rootPath: filePathController.value.rootPath, path_: filePathController.value.path).then((value) {
+    widget.loadFileItemListCallback(filePathController.value.rootPath,  filePathController.value.path).then((value) {
       exFileBrowseController.value = value;
     });
   }
 
-  ExTransformController exTransformController = ExTransformController();
+  // ExTransformController exTransformController = ExTransformController();
 
   @override
   Widget build(BuildContext context) {
@@ -73,91 +82,94 @@ class _FileExplorerState extends State<FileExplorer> {
       valueListenable: filePathController,
       builder: (BuildContext context, value, Widget? child) {
         ExFilePathController exFilePathController = ExFilePathController();
-        ExFileBrowseController exFileBrowseController = ExFileBrowseController();
+        ExFileBrowseController exFileBrowseController = widget.exFileBrowseController;
         load(filePathController, exFileBrowseController, exFilePathController);
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(15, 5, 0, 0),
-          child: Column(
-            children: [
-              ExFileOperate(
-                onUpload: () {
-                  Future<FilePickerResult?> result = FilePicker.platform.pickFiles(withReadStream: true);
-                  result.then((value) {
-                    if (value != null) {
-                      _uploadFile(context, filePathController.value.rootPath, filePathController.value.path, exTransformController, value).then((value) {
-                        if (value.success) {
-                          if (filePathController.value.rootPath == value.rootPath && filePathController.value.path == value.path) {
-                            load(filePathController, exFileBrowseController, exFilePathController);
-                          }
-                        }
-                      });
-                    }
-                  });
+        return Column(
+          children: [
+            // ExFileOperate(
+            //   onUpload: () {
+            //     Future<FilePickerResult?> result = FilePicker.platform.pickFiles(withReadStream: true);
+            //     result.then((value) {
+            //       if (value != null) {
+            //         _uploadFile(context, filePathController.value.rootPath, filePathController.value.path, exTransformController, value).then((value) {
+            //           if (value.success) {
+            //             if (filePathController.value.rootPath == value.rootPath && filePathController.value.path == value.path) {
+            //               load(filePathController, exFileBrowseController, exFilePathController);
+            //             }
+            //           }
+            //         });
+            //       }
+            //     });
+            //   },
+            //   onCreateNewFile: () {
+            //     TextEditingController unameController = TextEditingController();
+            //     showDialog<bool>(
+            //         context: context,
+            //         builder: (BuildContext context2) => AlertDialog(
+            //                 title: const Text('新建文件夹'),
+            //                 content: TextField(
+            //                   autofocus: true,
+            //                   controller: unameController,
+            //                   decoration: const InputDecoration(hintText: "文件名", prefixIcon: Icon(Icons.folder)),
+            //                 ),
+            //                 actions: <Widget>[
+            //                   TextButton(
+            //                     onPressed: () {
+            //                       Navigator.of(context2).pop(false);
+            //                     },
+            //                     child: const Text('取消'),
+            //                   ),
+            //                   TextButton(
+            //                     onPressed: () {
+            //                       FileOperate.createNewFolder(rootPath: filePathController.value.rootPath, path: filePathController.value.path, folder: unameController.text).then((value) {
+            //                         if (value) {
+            //                           Navigator.of(context2).pop(true);
+            //                         }
+            //                       });
+            //
+            //                       // if (unameController.text.isNotEmpty) {
+            //                       //   unameController.clear();
+            //                       // }
+            //
+            //                       // Navigator.of(context).pop(true);
+            //                     },
+            //                     child: const Text('确认'),
+            //                   ),
+            //                 ])).then((value){
+            //
+            //                   if(value!){
+            //                     load(filePathController, exFileBrowseController, exFilePathController);
+            //                   }
+            //
+            //     });
+            //   },
+            //   onRefresh: () {
+            //     load(filePathController, exFileBrowseController, exFilePathController);
+            //   },
+            //   exTransformController: exTransformController,
+            // ),
+            ExFilePath(
+                onPressed: (path) {
+                  filePathController.path = path;
+                  if (widget.onPathChanged != null) {
+                    widget.onPathChanged!(path);
+                  }
                 },
-                onCreateNewFile: () {
-                  TextEditingController unameController = TextEditingController();
-                  showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext context2) => AlertDialog(
-                              title: const Text('新建文件夹'),
-                              content: TextField(
-                                autofocus: true,
-                                controller: unameController,
-                                decoration: const InputDecoration(hintText: "文件名", prefixIcon: Icon(Icons.folder)),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context2).pop(false);
-                                  },
-                                  child: const Text('取消'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    FileOperate.createNewFolder(rootPath: filePathController.value.rootPath, path: filePathController.value.path, folder: unameController.text).then((value) {
-                                      if (value) {
-                                        Navigator.of(context2).pop(true);
-                                      }
-                                    });
-
-                                    // if (unameController.text.isNotEmpty) {
-                                    //   unameController.clear();
-                                    // }
-
-                                    // Navigator.of(context).pop(true);
-                                  },
-                                  child: const Text('确认'),
-                                ),
-                              ])).then((value){
-
-                                if(value!){
-                                  load(filePathController, exFileBrowseController, exFilePathController);
-                                }
-
-                  });
-                },
-                onRefresh: () {
-                  load(filePathController, exFileBrowseController, exFilePathController);
-                },
-                exTransformController: exTransformController,
-              ),
-              ExFilePath(
-                  onPressed: (path) {
-                    filePathController.path = path;
-                  },
-                  exFilePathController: exFilePathController,
-                  title: widget.exPath.name!),
-              Expanded(
-                child: ExFileBrowse(
-                    exFileBrowseController: exFileBrowseController,
-                    onDoubleTap: (item) {
-                      if (item.hasChild()) {
-                        filePathController.path = item.path!;
+                exFilePathController: exFilePathController,
+                title: widget.exPath.name!),
+            Expanded(
+              child: ExFileBrowse(
+                  exFileBrowseController: exFileBrowseController,
+                  onDoubleTap: (item) {
+                    if (item.hasChild()) {
+                      filePathController.path = item.path!;
+                      if (widget.onPathChanged != null) {
+                        widget.onPathChanged!(item.path!);
                       }
-                    }),
-              )
-            ],
-          ),
+                    }
+                  }),
+            )
+          ],
         );
       },
     );

@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 
+import '../entry/file.dart';
+import '../entry/path.dart';
 import 'ex_transformView.dart';
 
+typedef ExPathCallback = ExPath Function();
+
+
+
 class ExFileOperate extends StatefulWidget {
+
   ExFileOperate({super.key, this.onUpload, this.onCreateNewFile, this.onRefresh,required this.exTransformController});
 
   VoidCallback? onUpload;
   VoidCallback? onCreateNewFile;
   VoidCallback? onRefresh;
+
+
 
   ExTransformController exTransformController;
 

@@ -10,16 +10,18 @@ typedef VoidFileItemCallback = void Function(FileItem);
 class ExFileBrowseController extends ValueNotifier<List<FileItem>> {
   ExFileBrowseController() : super(List.empty());
 
-  bool isLoad = true;
+  bool _isLoad_ = true;
 
   @override
   set value(List<FileItem> value) {
-    isLoad = false;
+    _isLoad_ = false;
     super.value = value;
   }
 
+  bool get load=>_isLoad_;
+
   set load(bool isLoad) {
-    isLoad = true;
+    _isLoad_ = isLoad;
     notifyListeners();
   }
 }
@@ -44,7 +46,7 @@ class _ExFileBrowseState extends State<ExFileBrowse> {
         return _ExFileListView(
           fileItems: widget.exFileBrowseController.value,
           onDoubleTap: widget.onDoubleTap,
-          isLoad: widget.exFileBrowseController.isLoad,
+          isLoad: widget.exFileBrowseController.load,
         );
       },
     );
