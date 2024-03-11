@@ -20,12 +20,11 @@ import '../util/local_store.dart';
 import '../entry/response.dart' as resp;
 
 class UserOperate {
-  static Future<InfoItem> info() async {
+  static Future<InfoItem> info(BuildContext context) {
     var url = "${HttpClient.getBaseUrl()}user/info";
-    var response = await HttpClient.get(url);
-    var data = response.data;
-    var infoItem = InfoItem.fromJson(data);
-    return infoItem;
+    return HttpClient.getForMessageAndDialog(context, url).then((message) {
+      return InfoItem.fromJson(message.data);
+    });
   }
 
   static Future<InfoItem> reset() async {
@@ -210,10 +209,9 @@ class UserOperate {
     return res;
   }
 
-  static Future<Message> signIn(BuildContext context,{required String username, required String password, String? code, required bool start})  {
+  static Future<Message> signIn(BuildContext context, {required String username, required String password, String? code, required bool start}) {
     var url = "${HttpClient.getBaseUrl()}user/signIn";
-    return HttpClient.postJsonForMessageAndDialog(context,url, body: {"username": username, "password": password}, queryParameters: {"username": username, "code": code, "start": start});
-
+    return HttpClient.postJsonForMessageAndDialog(context, url, body: {"username": username, "password": password}, queryParameters: {"username": username, "code": code, "start": start});
   }
 
   static Future<void> downloadCert() async {

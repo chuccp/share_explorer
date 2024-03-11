@@ -35,7 +35,7 @@ class LoadPage extends StatefulWidget {
 class _LoadPageState extends State<LoadPage> {
   @override
   void initState() {
-    UserOperate.info().then((value) {
+    UserOperate.info(context).then((value) {
       ExCache.saveInfoItem(value);
       if (value.hasInit!) {
         if (value.hasSignIn!) {
@@ -48,7 +48,7 @@ class _LoadPageState extends State<LoadPage> {
           }
         }
       } else {
-        GoRouter.of(context).replace("/choose");
+        GoRouter.of(context).replace("/setting");
       }
     });
   }

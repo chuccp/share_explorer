@@ -48,15 +48,11 @@ class FileExplorer extends StatefulWidget {
   State<StatefulWidget> createState() => _FileExplorerState();
 }
 
-
-
-
-
 class _FileExplorerState extends State<FileExplorer> {
   void load(FilePathController filePathController, ExFileBrowseController exFileBrowseController, ExFilePathController exFilePathController) {
     exFileBrowseController.load = true;
     exFilePathController.value = filePathController.value.path;
-    widget.loadFileItemListCallback(filePathController.value.rootPath,  filePathController.value.path).then((value) {
+    widget.loadFileItemListCallback(filePathController.value.rootPath, filePathController.value.path).then((value) {
       exFileBrowseController.value = value;
       exFileBrowseController.path = filePathController.value.path;
     });
@@ -87,16 +83,20 @@ class _FileExplorerState extends State<FileExplorer> {
                 title: widget.exPath.name!),
             Expanded(
               child: ExFileBrowse(
-                  exFileBrowseController: exFileBrowseController,
-                  onDoubleTap: (item) {
-                    if (item.hasChild()) {
-                      filePathController.path = item.path!;
-                      exFileBrowseController.path = item.path!;
-                      if (widget.onPathChanged != null) {
-                        widget.onPathChanged!(item.path!);
-                      }
+                exFileBrowseController: exFileBrowseController,
+                onDoubleTap: (item) {
+                  if (item.hasChild()) {
+                    filePathController.path = item.path!;
+                    exFileBrowseController.path = item.path!;
+                    if (widget.onPathChanged != null) {
+                      widget.onPathChanged!(item.path!);
                     }
-                  }),
+                  }
+                },
+                onActionPressed: (ACTION action, FileItem fileItem) {
+                  print(action);
+                },
+              ),
             )
           ],
         );

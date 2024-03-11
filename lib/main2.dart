@@ -1,9 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:share_explorer/route.dart';
-
-import 'api/user.dart';
+import 'package:share_explorer/route2.dart';
 import 'generated/l10n.dart';
 
 void main() {
@@ -17,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     BrowserContextMenu.disableContextMenu();
     return MaterialApp.router(
-      showSemanticsDebugger: false,
+      debugShowCheckedModeBanner: false,
       supportedLocales: S.delegate.supportedLocales,
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate, S.delegate],
       title: "share_explorer",

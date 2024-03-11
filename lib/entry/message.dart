@@ -8,5 +8,5 @@ class Message {
 
   String msg;
 
-  dynamic? data;
+  dynamic data;
 }

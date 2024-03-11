@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../entry/file.dart';
 import 'ex_right_context_menu.dart';
-//ExRightContextMenu(
-//         menuChildren: [ContextMenuButtonConfig(label: "下载"), ContextMenuButtonConfig(label: "删除")],
-//         child: child,
-//       )
+
 class FileIconButton extends TextButton {
   FileIconButton({
     super.key,
     required VoidCallback? onTap,
     required VoidCallback? onDoubleTap,
+    required FileItem fileItem,
     bool? autofocus,
     FocusNode? focusNode,
     Clip? clipBehavior,
     required Widget icon,
     required Widget label,
+    List<ContextMenuButtonConfig>? fileMenuChildren,
+    List<ContextMenuButtonConfig>? dirMenuChildren,
   }) : super(
           onPressed: null,
           style: ButtonStyle(padding: MaterialStateProperty.all(EdgeInsets.zero)),
@@ -26,6 +26,9 @@ class FileIconButton extends TextButton {
             icon: icon,
             label: label,
             focusNode: focusNode,
+            fileItem: fileItem,
+            fileMenuChildren: fileMenuChildren,
+            dirMenuChildren: dirMenuChildren,
           ),
         );
 
@@ -36,6 +39,8 @@ class FileIconButton extends TextButton {
     required FileItem fileItem,
     required VoidCallback? onPressed,
     required VoidCallback? onDoubleTap,
+    required List<ContextMenuButtonConfig>? fileMenuChildren,
+    required List<ContextMenuButtonConfig>? dirMenuChildren,
   }) {
     IconData iconData = Icons.folder;
     if (!fileItem.isDir!) {
@@ -46,7 +51,10 @@ class FileIconButton extends TextButton {
         autofocus: autofocus,
         focusNode: focusNode,
         onDoubleTap: onDoubleTap,
+        fileItem: fileItem,
         onTap: onPressed,
+        fileMenuChildren: fileMenuChildren,
+        dirMenuChildren: dirMenuChildren,
         icon: Padding(
             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
             child: Icon(
@@ -65,6 +73,9 @@ class _FileIconButtonChild extends StatelessWidget {
     required this.onDoubleTap,
     required this.onTap,
     required this.focusNode,
+    required this.fileItem,
+    this.fileMenuChildren,
+    this.dirMenuChildren,
   });
 
   final Widget label;
@@ -75,25 +86,42 @@ class _FileIconButtonChild extends StatelessWidget {
 
   final FocusNode? focusNode;
 
+  final FileItem fileItem;
+
+  final List<ContextMenuButtonConfig>? fileMenuChildren;
+
+  final List<ContextMenuButtonConfig>? dirMenuChildren;
+
   @override
   Widget build(BuildContext context) {
-    return ExRightContextMenu(menuChildren:  [ContextMenuButtonConfig(label: "下载"), ContextMenuButtonConfig(label: "删除")],
-    child: LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return InkWell(
-          onDoubleTap: onDoubleTap,
-          onTap: onTap,
-          focusNode: focusNode,
-          child: Container(
-              color: Colors.transparent,
-              height: constraints.maxHeight,
-              width: constraints.maxWidth,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[icon, Flexible(child: label)],
-              )),
-        );
-      },
-    ),);
+    List<ContextMenuButtonConfig>? menuChildren = fileMenuChildren ?? List.empty();
+    if (fileItem.isDir!) {
+      menuChildren = dirMenuChildren ?? List.empty();
+    }
+    if (fileItem.isDisk!) {
+      menuChildren = List.empty();
+    }
+
+    return ExRightContextMenu(
+      menuChildren: menuChildren,
+      fileItem: fileItem,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return InkWell(
+            onDoubleTap: onDoubleTap,
+            onTap: onTap,
+            focusNode: focusNode,
+            child: Container(
+                color: Colors.transparent,
+                height: constraints.maxHeight,
+                width: constraints.maxWidth,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[icon, Flexible(child: label)],
+                )),
+          );
+        },
+      ),
+    );
   }
 }

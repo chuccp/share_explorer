@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:share_explorer/entry/path.dart';
 
 import '../api/file.dart';
-import '../entry/file.dart';
 import '../entry/progress.dart';
 import '../view/file/file_explorer.dart';
 import 'ex_button_group.dart';
@@ -18,11 +17,21 @@ class ExPathMenuController extends ValueNotifier<List<ExPath>> {
 
   @override
   set value(List<ExPath> value) {
-    _selectIndex = 0;
-    super.value = value;
+    if(value.isNotEmpty){
+      _selectIndex = 0;
+      super.value = value;
+    }
   }
 
-  ExPath get selectExPath => super.value[_selectIndex];
+  ExPath? get selectExPath => getSelectExPath();
+
+  ExPath? getSelectExPath() {
+    if (_selectIndex >= 0) {
+      return super.value[_selectIndex];
+    } else {
+      return null;
+    }
+  }
 
   int get selectIndex => _selectIndex;
 
@@ -53,7 +62,7 @@ class ExPathMenuList extends StatelessWidget {
 
   void refresh(ExFileBrowseController exFileBrowseController) {
     exFileBrowseController.load = true;
-    loadFileItemList(exPathMenuController.selectExPath.path!, exFileBrowseController.path).then((value) {
+    loadFileItemList(exPathMenuController.selectExPath!.path!, exFileBrowseController.path).then((value) {
       exFileBrowseController.value = value;
     });
   }
@@ -130,11 +139,11 @@ class ExPathMenuList extends StatelessWidget {
                         children: [
                           ExFileOperate(
                               exTransformController: exTransformController,
-                              onUpload: () {
+                              onUpload:  exPathMenuController.selectExPath == null?null:() {
                                 Future<FilePickerResult?> result = FilePicker.platform.pickFiles(withReadStream: true);
                                 result.then((value) {
                                   if (value != null) {
-                                    _uploadFile(context, exPathMenuController.selectExPath.path!, exFileBrowseController.path, exTransformController, value).then((value) {
+                                    _uploadFile(context, exPathMenuController.selectExPath!.path!, exFileBrowseController.path, exTransformController, value).then((value) {
                                       if (value.success) {
                                         refresh(exFileBrowseController);
                                       }
@@ -142,7 +151,7 @@ class ExPathMenuList extends StatelessWidget {
                                   }
                                 });
                               },
-                              onCreateNewFile: () {
+                              onCreateNewFile:  exPathMenuController.selectExPath == null?null:() {
                                 TextEditingController unameController = TextEditingController();
                                 showDialog<bool>(
                                     context: context,
@@ -162,7 +171,7 @@ class ExPathMenuList extends StatelessWidget {
                                               ),
                                               TextButton(
                                                 onPressed: () {
-                                                  FileOperate.createNewFolder(rootPath: exPathMenuController.selectExPath.path!, path: exFileBrowseController.path, folder: unameController.text)
+                                                  FileOperate.createNewFolder(rootPath: exPathMenuController.selectExPath!.path!, path: exFileBrowseController.path, folder: unameController.text)
                                                       .then((value) {
                                                     if (value) {
                                                       Navigator.of(context2).pop(true);
@@ -177,14 +186,14 @@ class ExPathMenuList extends StatelessWidget {
                                   }
                                 });
                               },
-                              onRefresh: () {
+                              onRefresh: exPathMenuController.selectExPath == null?null:() {
                                 refresh(exFileBrowseController);
                               }),
                           Expanded(child: Builder(
                             builder: (BuildContext context) {
-                              if ( exPathMenuController.value.isNotEmpty) {
+                              if (exPathMenuController.value.isNotEmpty) {
                                 return FileExplorer(
-                                  exPath: exPathMenuController.selectExPath,
+                                  exPath: exPathMenuController.selectExPath!,
                                   loadFileItemListCallback: (String rootPath, String path) {
                                     return loadFileItemList(rootPath, path).then((value) {
                                       return value;
