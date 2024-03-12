@@ -16,6 +16,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     BrowserContextMenu.disableContextMenu();
+
+
+
+    // js.context.callMethod('addEventListener', ['popstate', () {
+    //   // 处理返回按钮事件
+    // }]);
+
     return MaterialApp.router(
       showSemanticsDebugger: false,
       supportedLocales: S.delegate.supportedLocales,

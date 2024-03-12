@@ -31,6 +31,8 @@ class FilePathController extends ValueNotifier<FilePath> {
     value.path = path;
     notifyListeners();
   }
+
+  String get path => value.path;
 }
 
 class FileExplorer extends StatefulWidget {
@@ -60,6 +62,19 @@ class _FileExplorerState extends State<FileExplorer> {
 
   // ExTransformController exTransformController = ExTransformController();
 
+  void openDir(FilePathController filePathController, ExFileBrowseController exFileBrowseController, String path) {
+    filePathController.path = path;
+    exFileBrowseController.path = path;
+    if (widget.onPathChanged != null) {
+      widget.onPathChanged!(path);
+    }
+  }
+
+  void reload(FilePathController filePathController, ExFileBrowseController exFileBrowseController) {
+    filePathController.path = filePathController.path;
+    exFileBrowseController.path = filePathController.path;
+  }
+
   @override
   Widget build(BuildContext context) {
     FilePathController filePathController = FilePathController(exPath: widget.exPath);
@@ -73,11 +88,7 @@ class _FileExplorerState extends State<FileExplorer> {
           children: [
             ExFilePath(
                 onPressed: (path) {
-                  filePathController.path = path;
-                  exFileBrowseController.path = path;
-                  if (widget.onPathChanged != null) {
-                    widget.onPathChanged!(path);
-                  }
+                  openDir(filePathController, exFileBrowseController, path);
                 },
                 exFilePathController: exFilePathController,
                 title: widget.exPath.name!),
@@ -86,15 +97,23 @@ class _FileExplorerState extends State<FileExplorer> {
                 exFileBrowseController: exFileBrowseController,
                 onDoubleTap: (item) {
                   if (item.hasChild()) {
-                    filePathController.path = item.path!;
-                    exFileBrowseController.path = item.path!;
-                    if (widget.onPathChanged != null) {
-                      widget.onPathChanged!(item.path!);
-                    }
+                    openDir(filePathController, exFileBrowseController, item.path!);
                   }
                 },
                 onActionPressed: (ACTION action, FileItem fileItem) {
-                  print(action);
+                  if (action == ACTION.download && fileItem.isFile()) {
+                    FileOperate.download(rootPath: filePathController.value.rootPath, path_: fileItem.path!);
+                  }
+                  if (action == ACTION.open && fileItem.hasChild()) {
+                    openDir(filePathController, exFileBrowseController, fileItem.path!);
+                  }
+                  if (action == ACTION.delete && fileItem.isFile()) {
+                    FileOperate.delete(context, rootPath: filePathController.value.rootPath, path_: fileItem.path!).then((value) {
+                      if (value.ok) {
+                        reload(filePathController, exFileBrowseController);
+                      }
+                    });
+                  }
                 },
               ),
             )

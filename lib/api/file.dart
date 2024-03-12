@@ -4,7 +4,9 @@ import 'package:async/async.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:share_explorer/entry/message.dart';
 import '../entry/file.dart';
 import '../entry/token.dart';
 import '../util/download.dart';
@@ -41,8 +43,13 @@ class FileOperate {
   static void download({required String rootPath, required String path_}) async {
     ExToken? token = await LocalStore.getToken();
     var url =
-        "${HttpClient.getBaseUrl()}file/download?Path=${Uri.encodeComponent(path_)}&RootPath=${Uri.encodeComponent(rootPath)}&username=${Uri.encodeComponent(token!.username!)}&code=${Uri.encodeComponent(token!.code!)}&Token=${Uri.encodeComponent(token!.token!)}";
+        "${HttpClient.getBaseUrl()}file/download?path=${Uri.encodeComponent(path_)}&rootPath=${Uri.encodeComponent(rootPath)}&username=${Uri.encodeComponent(token!.username!)}&code=${Uri.encodeComponent(token!.code!)}&Token=${Uri.encodeComponent(token!.token!)}";
     downloadUrl(url);
+  }
+
+  static Future<Message> delete(BuildContext context, {required String rootPath, required String path_}) {
+    var url = "${HttpClient.getBaseUrl()}file/delete";
+    return HttpClient.getForMessageAndDialog(context, url, queryParameters: {"rootPath": rootPath, "path": path_});
   }
 
   static Future<bool> uploadNewFile({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
@@ -55,18 +62,9 @@ class FileOperate {
       for (var index = 0; index < sizeList.length; index++) {
         progressCallback(uploadNum, platformFile.size);
         var size = sizeList.elementAt(index);
-        if (kDebugMode) {
-          print("11111111");
-        }
         var stream = chunkedStreamReader.readStream(size);
-
-        if (kDebugMode) {
-          print("2222222");
-        }
-
         var response = await HttpClient.postFile(url,
-            data: stream,
-            queryParameters: {"seq": index, "size": size, "total": platformFile.size, "count": sizeList.length, "path": path, "rootPath": rootPath, "name": platformFile.name});
+            data: stream, queryParameters: {"seq": index, "size": size, "total": platformFile.size, "count": sizeList.length, "path": path, "rootPath": rootPath, "name": platformFile.name});
         if (response.statusCode != 200) {
           return Future.value(false);
         } else {
@@ -76,9 +74,6 @@ class FileOperate {
           }
         }
         uploadNum = uploadNum + size;
-        if (kDebugMode) {
-          print("3333333");
-        }
       }
       progressCallback(uploadNum, platformFile.size);
       return Future.value(true);

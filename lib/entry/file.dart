@@ -18,6 +18,14 @@ class FileItem {
     }
   }
 
+  bool isFile() {
+    if (isDisk! || isDir!) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   factory FileItem.fromJson(Map<String, dynamic> json) {
     DateTime modify = DateTime.now();
     if (json.containsKey('modifyTime')) {
