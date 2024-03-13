@@ -155,9 +155,7 @@ class UserOperate {
         exShowDialog(
             context: context,
             title: const Text("上传成功"),
-            onPressed: () {
-              return Future(() => true);
-            }).then((value) {
+            ).then((value) {
           if (value != null && value) {
             GoRouter.of(context).replace("/clientLogin");
           }

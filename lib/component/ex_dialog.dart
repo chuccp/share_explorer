@@ -20,6 +20,35 @@ Future<bool?> alertDialog({required BuildContext context, required String msg}) 
     },
   );
 }
+Future<bool?> confirmDialog({required BuildContext context, required String msg}) {
+  return showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text("提示"),
+        content: Text(msg),
+        actions: <Widget>[
+          TextButton(
+            child: const Text("确认"),
+            onPressed: () {
+              //关闭对话框并返回true
+              Navigator.of(context).pop(true);
+            },
+          ),
+          TextButton(
+            child: const Text("取消"),
+            onPressed: () {
+              //关闭对话框并返回true
+              Navigator.of(context).pop(false);
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
 
 Future<bool?> alertError({required BuildContext context, required String msg}) {
   return showDialog<bool>(
@@ -47,7 +76,7 @@ Future<bool?> alertError({required BuildContext context, required String msg}) {
 
 typedef FutureValueCallback = Future<bool> Function();
 
-Future<bool?> exShowDialog({required BuildContext context, required FutureValueCallback onPressed, Widget? title, Widget? content}) {
+Future<bool?> exShowDialog({required BuildContext context,  Widget? title, Widget? content}) {
   return showDialog<bool>(
     context: context,
     builder: (context) {
@@ -58,11 +87,7 @@ Future<bool?> exShowDialog({required BuildContext context, required FutureValueC
           TextButton(
             child: const Text("确认"),
             onPressed: () {
-              onPressed().then((value) {
-                if (value) {
-                  Navigator.of(context).pop(true);
-                }
-              });
+              Navigator.of(context).pop(true);
             },
           ),
         ],

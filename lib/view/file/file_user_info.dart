@@ -33,9 +33,7 @@ class UserInfo extends StatelessWidget {
                         TextField(controller: newPasswordController, obscureText: true,decoration: const InputDecoration(labelText: "新密码", hintText: "新密码"),),
                         TextField(controller: reNewPasswordController, obscureText: true,decoration: const InputDecoration(labelText: "重复新密码", hintText: "重复新密码"),)
                       ],) ,) ,
-                      onPressed: () {
-                        return Future.value(true);
-                      });
+                     );
                 },
               )
             ],

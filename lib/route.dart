@@ -1,8 +1,8 @@
 import 'package:go_router/go_router.dart';
-import 'package:share_explorer/page/client_setting.dart';
-import 'package:share_explorer/page/home.dart';
-import 'package:share_explorer/page/server_setting.dart';
-import 'package:share_explorer/page/setting.dart';
+import 'package:share_explorer/view/client_setting.dart';
+import 'package:share_explorer/view/home.dart';
+import 'package:share_explorer/view/server_setting.dart';
+import 'package:share_explorer/view/setting.dart';
 import 'package:share_explorer/view/client_login.dart';
 import 'package:share_explorer/view/file/file_manage.dart';
 import 'package:share_explorer/view/file/file_setting.dart';

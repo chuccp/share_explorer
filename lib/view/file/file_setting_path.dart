@@ -51,18 +51,18 @@ class _PathListState extends State<PathList> {
             content: _AddPathView(
               nameController: nameController,
               pathController: pathController,
-            ),
-            onPressed: () {
-              UserOperate.addPath(name: nameController.text, path: pathController.text).then((value) {
-                if (value.isOK()) {
-                  query(pageNo);
-                  return true;
-                } else {
-                  return false;
-                }
-              });
-              return Future(() => true);
+            )).then((value) {
+          if (value != null && value) {
+            UserOperate.addPath(name: nameController.text, path: pathController.text).then((value) {
+              if (value.isOK()) {
+                query(pageNo);
+                return true;
+              } else {
+                return false;
+              }
             });
+          }
+        });
       },
       deleteCallback: (int index) {
         if (list != null && list!.isNotEmpty) {
@@ -75,20 +75,21 @@ class _PathListState extends State<PathList> {
         TextEditingController nameController = TextEditingController();
         TextEditingController pathController = TextEditingController();
         exShowDialog(
-            title: const Text("修改路径"),
-            context: context,
-            content: _AddPathView(nameController: nameController, pathController: pathController, id: list![index].id!),
-            onPressed: () {
-              UserOperate.editPath(id: list![index].id!, name: nameController.text, path: pathController.text).then((value) {
-                if (value.isOK()) {
-                  query(pageNo);
-                  return true;
-                } else {
-                  return false;
-                }
-              });
-              return Future(() => true);
+          title: const Text("修改路径"),
+          context: context,
+          content: _AddPathView(nameController: nameController, pathController: pathController, id: list![index].id!),
+        ).then((value) {
+          if (value != null && value) {
+            UserOperate.editPath(id: list![index].id!, name: nameController.text, path: pathController.text).then((value) {
+              if (value.isOK()) {
+                query(pageNo);
+                return true;
+              } else {
+                return false;
+              }
             });
+          }
+        });
       },
       onPageChanged: (int pageNo) {
         query(pageNo);

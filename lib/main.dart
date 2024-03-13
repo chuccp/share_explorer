@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:share_explorer/route.dart';
-
-import 'api/user.dart';
 import 'generated/l10n.dart';
-
 void main() {
   runApp(const MyApp());
 }

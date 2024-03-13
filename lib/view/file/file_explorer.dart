@@ -5,6 +5,7 @@ import 'package:share_explorer/component/ex_file_operate.dart';
 import 'package:share_explorer/component/ex_file_path.dart';
 
 import '../../api/file.dart';
+import '../../component/ex_dialog.dart';
 import '../../component/ex_transformView.dart';
 import '../../entry/file.dart';
 import '../../entry/path.dart';
@@ -108,9 +109,13 @@ class _FileExplorerState extends State<FileExplorer> {
                     openDir(filePathController, exFileBrowseController, fileItem.path!);
                   }
                   if (action == ACTION.delete && fileItem.isFile()) {
-                    FileOperate.delete(context, rootPath: filePathController.value.rootPath, path_: fileItem.path!).then((value) {
-                      if (value.ok) {
-                        reload(filePathController, exFileBrowseController);
+                    confirmDialog(context: context, msg: '是否删除 ${fileItem.name!}').then((value) {
+                      if (value != null && value) {
+                        FileOperate.delete(context, rootPath: filePathController.value.rootPath, path_: fileItem.path!).then((value) {
+                          if (value.ok) {
+                            reload(filePathController, exFileBrowseController);
+                          }
+                        });
                       }
                     });
                   }
