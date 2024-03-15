@@ -89,6 +89,11 @@ Future<bool?> exShowDialog({required BuildContext context,  Widget? title, Widge
             onPressed: () {
               Navigator.of(context).pop(true);
             },
+          ),TextButton(
+            child: const Text("取消"),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
           ),
         ],
       );

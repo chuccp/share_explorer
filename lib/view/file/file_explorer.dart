@@ -34,6 +34,8 @@ class FilePathController extends ValueNotifier<FilePath> {
   }
 
   String get path => value.path;
+
+  String get rootPath => value.rootPath;
 }
 
 class FileExplorer extends StatefulWidget {
@@ -64,16 +66,20 @@ class _FileExplorerState extends State<FileExplorer> {
   // ExTransformController exTransformController = ExTransformController();
 
   void openDir(FilePathController filePathController, ExFileBrowseController exFileBrowseController, String path) {
-    filePathController.path = path;
-    exFileBrowseController.path = path;
-    if (widget.onPathChanged != null) {
-      widget.onPathChanged!(path);
+    if (mounted) {
+      filePathController.path = path;
+      exFileBrowseController.path = path;
+      if (widget.onPathChanged != null) {
+        widget.onPathChanged!(path);
+      }
     }
   }
 
   void reload(FilePathController filePathController, ExFileBrowseController exFileBrowseController) {
-    filePathController.path = filePathController.path;
-    exFileBrowseController.path = filePathController.path;
+    if (mounted) {
+      filePathController.path = filePathController.path;
+      exFileBrowseController.path = filePathController.path;
+    }
   }
 
   @override
@@ -99,6 +105,8 @@ class _FileExplorerState extends State<FileExplorer> {
                 onDoubleTap: (item) {
                   if (item.hasChild()) {
                     openDir(filePathController, exFileBrowseController, item.path!);
+                  }else{
+                    FileOperate.download(rootPath: filePathController.value.rootPath, path_: item.path!);
                   }
                 },
                 onActionPressed: (ACTION action, FileItem fileItem) {
@@ -112,6 +120,19 @@ class _FileExplorerState extends State<FileExplorer> {
                     confirmDialog(context: context, msg: '是否删除 ${fileItem.name!}').then((value) {
                       if (value != null && value) {
                         FileOperate.delete(context, rootPath: filePathController.value.rootPath, path_: fileItem.path!).then((value) {
+                          if (value.ok) {
+                            reload(filePathController, exFileBrowseController);
+                          }
+                        });
+                      }
+                    });
+                  }
+
+                  if (action == ACTION.rename && !fileItem.isDisk!) {
+                    TextEditingController? controller = TextEditingController();
+                    exShowDialog(context: context, title: Text("重命名:${fileItem.name!}"), content: TextField(controller: controller, autofocus: true)).then((value) {
+                      if (value != null && value) {
+                        FileOperate.rename(context, rootPath: filePathController.rootPath, path_: filePathController.path, oldName: fileItem.name!, newName: controller.text).then((value) {
                           if (value.ok) {
                             reload(filePathController, exFileBrowseController);
                           }

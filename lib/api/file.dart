@@ -52,6 +52,11 @@ class FileOperate {
     return HttpClient.getForMessageAndDialog(context, url, queryParameters: {"rootPath": rootPath, "path": path_});
   }
 
+  static Future<Message> rename(BuildContext context, {required String rootPath, required String path_,required String oldName,required String newName}) {
+    var url = "${HttpClient.getBaseUrl()}file/rename";
+    return HttpClient.postJsonForMessageAndDialog(context, url,body: {"path": path_, "rootPath": rootPath, "oldName": oldName,"newName":newName});
+  }
+
   static Future<bool> uploadNewFile({required String rootPath, required String path, required FilePickerResult? pickerResult, required dio.ProgressCallback progressCallback}) async {
     PlatformFile? platformFile = pickerResult?.files.first;
     if (platformFile != null) {
