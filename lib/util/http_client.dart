@@ -29,7 +29,7 @@ class HttpClient {
       if (rs.code == 200 || rs.code == 203) {
         return Message(ok: true, msg: rs.error!, code: rs.code!, data: rs.data);
       }
-      return Message(ok: false, msg: rs.data, code: rs.code!);
+      return Message(ok: false, msg: rs.error!, code: rs.code!);
     }
   }
 

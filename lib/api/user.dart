@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:go_router/go_router.dart';
 import 'package:share_explorer/component/ex_dialog_loading.dart';
+import 'package:share_explorer/component/ex_dialog_loading2.dart' as dialog;
 import '../component/ex_dialog.dart';
 import '../component/ex_load.dart';
 import '../entry/info.dart';
@@ -35,23 +36,18 @@ class UserOperate {
     return infoItem;
   }
 
-  static void connect({required String address, required BuildContext context}) {
-    var url = "${HttpClient.getBaseUrl()}user/connect?address=$address";
-    exShowDialogLoading(
-        title: const Text("网络测试中"),
-        context: context,
-        onFinish: (value) {
-          if (value.isOK()) {
-            alertDialog(context: context, msg: value.data);
-          } else {
-            alertDialog(context: context, msg: value.error!);
-          }
-        },
-        onLoadingData: () {
-          return HttpClient.get(url).then((response) => response.data).then((data) => Response.fromJson(data)).then((value) {
-            return value;
-          });
-        });
+  static void ping({required String address, required BuildContext context}) {
+    var url = "${HttpClient.getBaseUrl()}user/ping";
+    dialog.exShowDialogLoading(
+            context: context,
+            onLoadData: () {
+              return HttpClient.getForMessage(url, queryParameters: {"address": address});
+            })
+        .then((value) {
+      if (value != null && value.ok) {
+        alertDialog(context: context, msg: value.data);
+      }
+    });
   }
 
   static Future<Response<ExPage<ExPath>>> queryPath({required int pageNo, required int pageSize}) async {
@@ -153,9 +149,9 @@ class UserOperate {
         }).then((value) {
       if (value != null && value) {
         exShowDialog(
-            context: context,
-            title: const Text("上传成功"),
-            ).then((value) {
+          context: context,
+          title: const Text("上传成功"),
+        ).then((value) {
           if (value != null && value) {
             GoRouter.of(context).replace("/clientLogin");
           }

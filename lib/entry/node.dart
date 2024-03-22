@@ -1,11 +1,9 @@
 import '../util/json.dart';
 class ExNode {
 
-  ExNode({this.nodeType, this.serverName, this.address,this.lastLiveTime});
+  ExNode({this.id, this.address,this.lastLiveTime});
 
-  int? nodeType;
-
-  String? serverName;
+  String? id;
 
   String? address;
 
@@ -13,8 +11,7 @@ class ExNode {
 
   factory ExNode.fromJson(Map<String, dynamic> json) {
     return ExNode(
-        nodeType: Json.getInt(json, "nodeType"),
-        serverName: Json.getString(json, "serverName"),
+      id: Json.getString(json, "id"),
         address: Json.getString(json, "address"),
         lastLiveTime: Json.getDateTime(json, "lastLiveTime"),
        );

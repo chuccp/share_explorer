@@ -22,7 +22,7 @@ class ClientSettingPage extends StatelessWidget {
           body: AddressInputGroup(
               addressControllers: addressControllers!,
               testCallback: (value) {
-                UserOperate.connect(address: value.toString(), context: context);
+                UserOperate.ping(address: value.toString(), context: context);
               }),
           footer: FooterButtonGroup(
             rightButtonText: '设置',

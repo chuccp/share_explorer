@@ -21,11 +21,11 @@ class _RegisterListState extends State<RegisterList> {
 
   void query(int pageNo) {
     this.pageNo = pageNo;
-    DiscoverOperate.nodeList(pageNo: pageNo, pageSize: dataTableController.page.pageSize!,nodeType: 0).then((value) {
+    DiscoverOperate.nodeNatServerList(pageNo: pageNo, pageSize: dataTableController.page.pageSize!).then((value) {
       list = value.data!.list;
       var total = value.data!.total;
       var dataList = <List<dynamic>>[
-        for (var ele in list!) <dynamic>[ele.nodeType, ele.serverName, ele.address,ele.lastLiveTime]
+        for (var ele in list!) <dynamic>[ele.nodeType, ele.id, ele.address,ele.lastLiveTime]
       ];
       dataTableController.updateTable(dataList, total!, pageNo);
     });
